@@ -15,11 +15,12 @@ public class Libreria {
             System.out.println(formatString("rojo")+"1. Registrar Usuario.");
             System.out.println(formatString("rojo")+"2. Login.");
             System.out.println(formatString("rojo")+"3. Cerrar Sesión.");
-            System.out.println(formatString("rojo")+"4. Ver todos los usuarios.");
-            System.out.println(formatString("rojo")+"5. SALIR."+formatString("reset"));
+            System.out.println(formatString("rojo")+"4. Usar sin registrar.");
+            System.out.println(formatString("rojo")+"5. Ver todos los usuarios.");
+            System.out.println(formatString("rojo")+"6. SALIR."+formatString("reset"));
             System.out.print(">");
             opcion=compInput();
-        }while(opcion<1 || opcion>5);
+        }while(opcion<1 || opcion>6);
         opcion-=1;
         return opciones[opcion];
     }  
@@ -48,13 +49,19 @@ public class Libreria {
     
     
     
-    
-    
+    //comprueba si existe algún usuario con el nombre que recibe por el String
+    public static boolean checkUsuario(String usr, Conexion con) throws SQLException{
+        String select="select count(*) from usuarios where usr='"+usr+"'";
+        int check=Character.getNumericValue(con.selectToString(select).charAt(0));
+        if(check>0)return true;
+        else return false;
+    }
     
     //devuelve el nivel de privilegios de un usuario que recibe como argumento
     public static int compruebaPrivilegiosCredenciales(Conexion con, String usr, String pass) throws ClassNotFoundException, SQLException{
         int lvl=0;
-        //usuario.oracleCompruebaUser(con, usuario.getUsr(), usuario.getPass());
+        //pass=cifrar(pass, 'd');//se descifra
+        
         String select="select lvl from usuarios where usr='"+usr+"' and pass='"+pass+"'";
         try{
             lvl= Character.getNumericValue(con.selectToString(select).charAt(0));  //guarda como int el primer char que devuelve con.selectToString(consulta), que es el lvl de permiso
@@ -115,8 +122,43 @@ public class Libreria {
     //borrar receta
     /*
     public static void borraReceta(Conexion con, Usuario login){
-        
+        String creador=
     }*/
+    
+    //cifra y descifra texto - opc='c' - opc='d'
+    public static String cifrar(String texto, char opc){
+        String out="";
+        char letra=' ';
+        int clave=3;//(random(28)%texto.length());
+        char[] aux=new char[texto.length()];
+        char[] cifrado=new char[aux.length];
+        if(opc=='c'){
+            for(int i=0; i<aux.length; i++){
+                letra=texto.charAt(i);
+                letra+=clave;
+                out+=letra;
+            }
+            //System.out.println("TEST: pass cif: "+out);
+        }
+        if(opc=='d'){
+            for(int i=0; i<aux.length; i++){
+                letra=texto.charAt(i);
+                letra-=clave;
+                out+=letra;
+            }
+            //System.out.println("TEST: pass descif: "+out);
+        }
+        return out;
+    }
+    
+    //Generación automática de números
+    public static int random(int tope){//el tope indica el número máximo generado, siendo en el rango [0-tope]
+        double roll=Math.random();
+        roll*=tope;
+        int trun=(int)roll;
+        return trun;
+    }
+    
     
     //Cambia los colores de cualquier printline
     public static String formatString(String format_color){
@@ -149,3 +191,4 @@ public class Libreria {
     }
     
 }
+

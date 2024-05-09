@@ -25,15 +25,19 @@ public class Cocina_Canibal {
                         System.out.println("Usuario:");
                         System.out.print(">");
                         usr=teclado.next();
-                        System.out.println("Pass (10 chars max):");
-                        System.out.print(">");
-                        pass=teclado.next();
-                        System.out.println("eMail:");
-                        System.out.print(">");
-                        mail=teclado.next();
-                        usuarioCrea=new Usuario(con,usr,pass,mail,1, false);//genera el objeto para luego registrarlo en la BD, falso porque crea un usuario, no es un login
-                        usuarioCrea.oracleRegistraUsuario(con);//lo registra en la base de datos
-                        usuarioCrea=null;//se deja a null porque ya no es necesario el objeto
+                        if(!checkUsuario(usr, con)){
+                            System.out.println("Pass (10 chars max):");
+                            System.out.print(">");
+                            pass=teclado.next();
+                            pass=cifrar(pass, 'c');
+                            System.out.println("eMail:");
+                            System.out.print(">");
+                            mail=teclado.next();
+                            usuarioCrea=new Usuario(con,usr,pass,mail,1, false);//genera el objeto para luego registrarlo en la BD, falso porque crea un usuario, no es un login
+                            usuarioCrea.oracleRegistraUsuario(con);//lo registra en la base de datos
+                            usuarioCrea=null;//se deja a null porque ya no es necesario el objeto
+                        }
+                        else System.out.println("El usuario ya existe.");
                         break;
 
                     case COMP_LOGIN:
@@ -44,6 +48,7 @@ public class Cocina_Canibal {
                         System.out.println("Pass (10 chars max):");
                         System.out.print(">");
                         pass=teclado.next();
+                        pass=cifrar(pass, 'c');//se cifra
                         System.out.println("eMail:");
                         System.out.print(">");
                         mail=teclado.next();
@@ -72,7 +77,11 @@ public class Cocina_Canibal {
                         }
                         else System.out.println("Login necesario.");
                         break;
-
+                    case USAR_SIN_LOGIN:
+                        login=new Usuario(con, "base","base","no tiene", 0, true);
+                        logged=true;
+                        salirLogin=true;
+                        break;
                     case VER_USUARIOS:
                         if(logged){//requiere login
                             if(login.getLvl()==2){//sólo el login con lvl 2 (admin)
@@ -103,7 +112,6 @@ public class Cocina_Canibal {
                                 nom_receta=teclado.nextLine();
                                 System.out.println("Descripción de la receta: ");
                                 descripcion=teclado.nextLine();
-                                //System.out.println(login.toString());
                                 recetaCrea=new Receta(con, login, nom_receta, descripcion);
                                 recetaCrea.oracleRegistraReceta(con);
                                 recetaCrea=null;
@@ -126,7 +134,20 @@ public class Cocina_Canibal {
                         break;
 
                     case ELIMINA_RECETA:
-
+                        if(logged){//requiere login
+                            if(login.getLvl()>0){//sólo el login con lvl 1 o 2
+                                
+                                //AQUI
+                                
+                                
+                            }
+                            else{
+                                System.out.println("Sólo usuarios registrados.");
+                            }
+                        }
+                        else {
+                            System.out.println("Login necesario.");
+                        }
                         break;
                     case MOSTRAR_TODAS:
                         if(logged){//requiere login
