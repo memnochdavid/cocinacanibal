@@ -3,8 +3,8 @@
 import java.sql.*;
 public class Conexion {
     private String url="jdbc:oracle:thin:@//localhost:1521/xe";
-    private String username="aula";
-    private String pass="aula";
+    private String username="casa";
+    private String pass="casa";
     
     public Conexion(String str, char opc) throws ClassNotFoundException, SQLException {    
         Class.forName("oracle.jdbc.driver.OracleDriver");        

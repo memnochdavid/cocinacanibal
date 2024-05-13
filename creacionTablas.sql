@@ -1,19 +1,17 @@
 --delete from usuarios;
 --delete from recetas;
---drop table usuarios;
---drop table recetas;
+drop table usuarios cascade constraints;
+drop table recetas cascade constraints;
 
 create table usuarios
 (
 	--cod 	number(3),
 	usr 	varchar2(25),
-	pass    varchar2(25) not null,
+	pass    varchar2(100) not null,
 	mail    varchar2(50),
     lvl     number(1) check (lvl between 0 and 2),
     constraint pk_usuarios primary key (usr)
 );
-
-
 
 create table recetas
 (
@@ -21,9 +19,12 @@ create table recetas
 	owner 	varchar2(25),
     nombre  varchar2(25),
 	descripcion    varchar2(100) not null,
+    ingredientes varchar2(550),
+    
 	constraint pk_recetas primary key (cod),
-	constraint fk_rec_usu foreign key (owner) references usuarios(usr)	
+	constraint fk_rec_usu foreign key (owner) references usuarios(usr)
 );
+
 
 
 insert into usuarios values ('admin', 'admin', 'admin@admin.com', 2);

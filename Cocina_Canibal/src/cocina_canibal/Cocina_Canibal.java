@@ -1,12 +1,13 @@
 package cocina_canibal;
-import static cocina_canibal.Libreria.*;
+import static cocina_canibal.Libreria.*; //Asi no hay que crear una clase libreria y estar llamando como lib.metodo()
 import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Cocina_Canibal {
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
         Scanner teclado=new Scanner(System.in, "ISO-8859-2");
-        boolean logged=false, salirLogin=false, salir=false, salirReceta=false;
+        boolean logged=false, salirLogin=false, salir=false, salirReceta=false, salirIni=false;
+        MenuIni opcionIni;
         MenuUsuario opcionLogin;
         MenuReceta opcionReceta;
         
@@ -18,19 +19,36 @@ public class Cocina_Canibal {
         Conexion con=new Conexion();
         do{
             do{
+                opcionIni=menuIni();
+                do{
+                    switch(opcionIni){
+                        case SET_BD:
+                            destroyAll(con); //ANDAR CON OJETE
+                            creaTablas(con);
+                            salirIni=true;
+                            break;
+                        case SALIR:
+                            salirIni=true;
+                            break;
+                    }
+                }while(!salirIni);        
                 opcionLogin=menuLogin();
                 switch(opcionLogin){
                     case REG_USR:
-                        System.out.println(formatString("rojo")+"---REGISTRO DE USUARIO---"+formatString("reset"));
-                        System.out.println("Usuario:");
+                        System.out.println("\033[34m---REGISTRO DE USUARIO---"+formatString("reset"));
+                        System.out.println("\u001B[35mUsuario:\033[30m");
                         System.out.print(">");
                         usr=teclado.next();
+                        boolean validaContr; //variable creado para comprobar la fuerza de la contraseña y si es valida
                         if(!checkUsuario(usr, con)){
-                            System.out.println("Pass (10 chars max):");
-                            System.out.print(">");
-                            pass=teclado.next();
-                            pass=cifrar(pass, 'c');
-                            System.out.println("eMail:");
+                            do{
+                                System.out.println("\u001B[35mPassword (10 chars max):\033[30m");
+                                System.out.print(">");
+                                pass=teclado.next();
+                                validaContr = validaContraseña(pass, usr);
+                            }while(!validaContr);                           
+                            pass=cifrarContrasena(pass);
+                            System.out.println("\u001B[35meMail:\033[30m");
                             System.out.print(">");
                             mail=teclado.next();
                             usuarioCrea=new Usuario(con,usr,pass,mail,1, false);//genera el objeto para luego registrarlo en la BD, falso porque crea un usuario, no es un login
@@ -40,21 +58,21 @@ public class Cocina_Canibal {
                         else System.out.println("El usuario ya existe.");
                         break;
 
-                    case COMP_LOGIN:
-                        System.out.println(formatString("rojo")+"---COMPRUEBA USUARIO---"+formatString("reset"));
-                        System.out.println("Usuario:");
+                    case COMP_LOGIN: //inicia sesión
+                        System.out.println("\033[34m---COMPRUEBA USUARIO---"+formatString("reset"));
+                        System.out.println("\u001B[35mUsuario:\033[30m");
                         System.out.print(">");
                         usr=teclado.next();
-                        System.out.println("Pass (10 chars max):");
+                        System.out.println("\u001B[35mPassword:\033[30m"); 
                         System.out.print(">");
                         pass=teclado.next();
-                        pass=cifrar(pass, 'c');//se cifra
-                        System.out.println("eMail:");
+                        pass=cifrarContrasena(pass);//se cifra
+                        System.out.println("\u001B[35meMail:\033[30m");
                         System.out.print(">");
                         mail=teclado.next();
-                        lvl=Libreria.compruebaPrivilegiosCredenciales(con, usr, pass);//recibe un int correspondiente al lvl de acceso del usuario a comprobar. Si no existe, el lvl es 0. Si es un admin, el lvl es 2, si es un usuario ya registrado, el lvl de acceso es 1
+                        lvl=compruebaPrivilegiosCredenciales(con, usr, pass);//recibe un int correspondiente al lvl de acceso del usuario a comprobar. Si no existe, el lvl es 0. Si es un admin, el lvl es 2, si es un usuario ya registrado, el lvl de acceso es 1
                         if(lvl==0){//no existe
-                            login=new Usuario(con, "base","base","no tiene", 0, true);
+                            login=new Usuario(con, "base","base","base", 0, true);
                             System.out.println("Usuario base.");
                         }
                         if(lvl==1){//ha encontrado coincidencia y crea el objeto login de la clase Usuario con lvl de acceso 1
@@ -63,7 +81,7 @@ public class Cocina_Canibal {
 
                         }
                         if(lvl==2){// credenciales de admin para objeto login de la clase Usuario, lvl de acceso 2
-                            login=new Usuario(con, usr,pass,mail, 1, true);
+                            login=new Usuario(con, usr,pass,mail, 2, true);
                             System.out.println("Usuario admin.");
                         }
                         logged=true;
@@ -78,7 +96,7 @@ public class Cocina_Canibal {
                         else System.out.println("Login necesario.");
                         break;
                     case USAR_SIN_LOGIN:
-                        login=new Usuario(con, "base","base","no tiene", 0, true);
+                        login=new Usuario(con, "base","base","base", 0, true);
                         logged=true;
                         salirLogin=true;
                         break;
@@ -112,7 +130,8 @@ public class Cocina_Canibal {
                                 nom_receta=teclado.nextLine();
                                 System.out.println("Descripción de la receta: ");
                                 descripcion=teclado.nextLine();
-                                recetaCrea=new Receta(con, login, nom_receta, descripcion);
+                                String ingredientes = ingredientes(con);
+                                recetaCrea=new Receta(con, login, nom_receta, descripcion, ingredientes);
                                 recetaCrea.oracleRegistraReceta(con);
                                 recetaCrea=null;
                             }
@@ -130,7 +149,7 @@ public class Cocina_Canibal {
                         teclado.nextLine();
                         System.out.println("Búsqueda: ");
                         String busqueda=teclado.nextLine();
-                        muestraRecetas(con, busqueda, 'u');
+                        muestraRecetas(con, busqueda);
                         break;
 
                     case ELIMINA_RECETA:
@@ -151,8 +170,8 @@ public class Cocina_Canibal {
                         break;
                     case MOSTRAR_TODAS:
                         if(logged){//requiere login
-                            if(login.getLvl()==2){//sólo el admin
-                                muestraRecetas(con, "", 'a');
+                            if(login.getLvl()==1 || login.getLvl()==2){//sólo el admin
+                                muestraRecetas(con, "");
                             }
                             else{
                                 System.out.println("Sólo usuarios registrados.");
@@ -164,6 +183,7 @@ public class Cocina_Canibal {
                         break;
                     case SALIR:
                         salirReceta=true;
+                        salir = true; //ESTA AQUI POR AHORA PARA PODER CERRAR EL PROGRAMA
                         break;
                     default:
                         break;

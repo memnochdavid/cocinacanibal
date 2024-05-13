@@ -3,8 +3,8 @@ package cocina_canibal;
 import java.sql.*;
 public class Conexion {
     private String url="jdbc:oracle:thin:@//localhost:1521/xe";
-    private String username="aula";
-    private String pass="aula";
+    private String username="casa";
+    private String pass="casa";
     private Connection con; 
     
     public Conexion() throws ClassNotFoundException, SQLException {    //constructor
@@ -40,7 +40,7 @@ public class Conexion {
         return out;
     }
     
-    public void insert(String str) throws SQLException{ //ejecuta un insert a partir de un String srt
+    public void insert(String str) throws SQLException{ //ejecuta un insert o cualquier tipo de acceso de modificación a partir de un String srt
         Statement st=con.createStatement();
         System.out.println("Insertando...");
         st.executeUpdate(str);
