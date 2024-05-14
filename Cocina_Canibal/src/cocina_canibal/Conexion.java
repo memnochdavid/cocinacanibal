@@ -42,7 +42,7 @@ public class Conexion {
     
     public void insert(String str) throws SQLException{ //ejecuta un insert o cualquier tipo de acceso de modificación a partir de un String srt
         Statement st=con.createStatement();
-        System.out.println("Insertando...");
+        //System.out.println("OK...");
         st.executeUpdate(str);
     }
     

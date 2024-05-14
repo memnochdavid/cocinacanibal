@@ -17,6 +17,7 @@ public class Cocina_Canibal {
         Usuario login=null;
         Receta recetaCrea;
         Conexion con=new Conexion();
+       //devuelveEtiquetas();
         do{
             do{
                 opcionIni=menuIni();
@@ -24,9 +25,8 @@ public class Cocina_Canibal {
                     switch(opcionIni){
                         case SET_BD:
                             destroyAll(con); //ANDAR CON OJETE
-                            creaTablas(con);
+                            BDsetUp(con);//crea todo lo necesario para usar la apli sin necesidad de usar ORACLE
                             salirIni=true;
-                            break;
                         case SALIR:
                             salirIni=true;
                             break;
@@ -123,6 +123,8 @@ public class Cocina_Canibal {
                     case CREA_RECETA:
                         String descripcion="";//Esto es temporal, hasta tener el pdf - sólo para probar los permisos de creación
                         String nom_receta="";
+                        String ingredientes="";
+                        String pasos="";
                         if(logged){//requiere login
                             if(login.getLvl()>0){//sólo el login con lvl 1 o 2
                                 teclado.nextLine();
@@ -130,10 +132,14 @@ public class Cocina_Canibal {
                                 nom_receta=teclado.nextLine();
                                 System.out.println("Descripción de la receta: ");
                                 descripcion=teclado.nextLine();
-                                String ingredientes = ingredientes(con);
-                                recetaCrea=new Receta(con, login, nom_receta, descripcion, ingredientes);
-                                recetaCrea.oracleRegistraReceta(con);
-                                recetaCrea=null;
+                                ingredientes = ingredientes();//guarda todos los ingredientes en un String, separados por coma
+                                pasos=pasosReceta();
+                                recetaCrea=new Receta(con, login, nom_receta, descripcion, ingredientes, pasos);
+                                //System.out.println(nom_receta);
+                                //System.out.println(login.getUsr());
+                                recetaCrea.oracleRegistraReceta(con);//guarda en la BD
+                                registraEtiquetas(con, login, recetaCrea);
+                                recetaCrea=null;//destruye el objeto para volver a ser usado cuando haga falta
                             }
                             else{
                                 System.out.println("Sólo usuarios registrados.");
@@ -145,11 +151,24 @@ public class Cocina_Canibal {
                         }
                         break;
 
-                    case BUSCA_RECETA:
+                    case BUSCA_RECETA:                        
                         teclado.nextLine();
-                        System.out.println("Búsqueda: ");
-                        String busqueda=teclado.nextLine();
-                        muestraRecetas(con, busqueda);
+                        String busqueda="";
+                        char tipoBus=' ';
+                        System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
+                        do{
+                            System.out.print(">");
+                            tipoBus=teclado.next().charAt(0);
+                            if(tipoBus=='N')tipoBus='n';
+                            if(tipoBus=='E')tipoBus='e';
+                        }while(tipoBus!='n' && tipoBus!='e');
+                        if(tipoBus=='n') System.out.println("Búsqueda por Nombre: ");{
+                            busqueda=teclado.nextLine();
+                        }
+                        if(tipoBus=='e') System.out.println("Búsqueda por Etiqueta: ");{
+                            busqueda=teclado.next();                        
+                        }
+                        muestraRecetas(con, busqueda, tipoBus);
                         break;
 
                     case ELIMINA_RECETA:
@@ -168,14 +187,14 @@ public class Cocina_Canibal {
                             System.out.println("Login necesario.");
                         }
                         break;
-                    case MOSTRAR_TODAS:
+                    case MOSTRAR_TODAS://en obras
                         if(logged){//requiere login
-                            if(login.getLvl()==1 || login.getLvl()==2){//sólo el admin
+                            /*if(login.getLvl()==1 || login.getLvl()==2){//sólo el admin
                                 muestraRecetas(con, "");
                             }
                             else{
                                 System.out.println("Sólo usuarios registrados.");
-                            }
+                            }*/
                         }
                         else {
                             System.out.println("Login necesario.");

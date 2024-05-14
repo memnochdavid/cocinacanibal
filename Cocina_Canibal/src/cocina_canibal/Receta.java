@@ -7,27 +7,19 @@ public class Receta {
     private String nombre;
     private String desc="";
     private String ingredientes;
+    private String pasos;
     
-    public Receta(Conexion con, Usuario login, String nombre, String descripcion, String ingr) throws SQLException{
-        cod=updateRecetaID(con)+1;
+    public Receta(Conexion con, Usuario login, String nombre, String descripcion, String ingr, String steps) throws SQLException{
         owner=login.getUsr();
         this.nombre=nombre;
         desc=descripcion;
         ingredientes = ingr;
+        pasos=steps;
     }
     
-    
-    
-    private int updateRecetaID(Conexion con) throws SQLException{//devuelve el max(cod) de la tabla usuarios que no sean 'admin' ni 'base'
-        String select="select count(*) from recetas";
-        return Character.getNumericValue(con.selectToString(select).charAt(0));
-    }
-    
-    
-    
-    protected void oracleRegistraReceta(Conexion c) throws ClassNotFoundException, SQLException{
+    protected void oracleRegistraReceta(Conexion c) throws ClassNotFoundException, SQLException{//la inserta en la BD
         boolean exito=false;
-        String insert="insert into recetas (cod, owner, nombre, descripcion, ingredientes) values("+cod+", '"+owner+"', '"+nombre+"', '"+desc+"', '"+ingredientes+"')";
+        String insert="insert into recetas (owner, nombre, descripcion, ingredientes, pasos) values('"+owner+"', '"+nombre+"', '"+desc+"', '"+ingredientes+"','"+pasos+"')";
         
         try{
             c.insert(insert);
@@ -41,4 +33,9 @@ public class Receta {
         }
         
     }
+
+    public String getNombre() {
+        return nombre;
+    }
+    
 }
