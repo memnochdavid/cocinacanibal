@@ -129,7 +129,7 @@ public class Libreria {
                     ingre=con.selectToString("select ingredientes from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     pasos=con.selectToString("select pasos from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "").replaceAll(" - ", "\n");;
                     cod=con.selectToString("select cod from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
-                    System.out.println("\nCódigo: "+cod+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+                    if(!cod.equals("")) System.out.println("\nCódigo: "+cod+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
                     cont++;
                 }
             }
@@ -155,8 +155,8 @@ public class Libreria {
                     desc=con.selectToString("select descripcion from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
                     ingre=con.selectToString("select ingredientes from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
                     pasos=con.selectToString("select pasos from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "").replaceAll(" - ", "\n");
-                    cod=con.selectToString("select cod from recetas where cod="+cont+")").replaceAll(" - \n", "");
-                    System.out.println("\nCódigo: "+cod+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+                    cod=con.selectToString("select cod from recetas where cod="+cont).replaceAll(" - \n", "");
+                    if(!cod.equals("")) System.out.println("\nCódigo: "+cod+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
                     cont++;
                 }
             }
@@ -179,7 +179,7 @@ public class Libreria {
     
     //pide ingredientes hasta que el usuario quiera parar, entonces los guarda todos en un String que devuelve
     public static String ingredientes() throws SQLException{
-        Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in, "ISO-8859-2");
         int cont = 0; //Variable que va a ir contabilizando el numero de ingredientes
         String[] ingredientes = new String[25];
         boolean salir = false;
@@ -210,7 +210,7 @@ public class Libreria {
     
     //pregunta por los pasos de una receta hasta que el usuario quiera parar, entonces los guarda todos en un String que devuelve
     public static String pasosReceta() throws SQLException{
-        Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in, "ISO-8859-2");
         int cont = 0; //Variable que va a ir contabilizando el numero de ingredientes
         int n_paso=1;
         String[] pasos = new String[25];
