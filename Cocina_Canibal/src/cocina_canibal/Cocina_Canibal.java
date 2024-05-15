@@ -187,14 +187,11 @@ public class Cocina_Canibal {
                             System.out.println("Login necesario.");
                         }
                         break;
-                    case MOSTRAR_TODAS://en obras
+                    case MODIFICAR://en obras                        
                         if(logged){//requiere login
-                            /*if(login.getLvl()==1 || login.getLvl()==2){//sólo el admin
-                                muestraRecetas(con, "");
-                            }
-                            else{
-                                System.out.println("Sólo usuarios registrados.");
-                            }*/
+                            System.out.println("Modificar Recetas.");
+                            //AQUI
+                            
                         }
                         else {
                             System.out.println("Login necesario.");
