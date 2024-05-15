@@ -3,8 +3,8 @@ package cocina_canibal;
 import java.sql.*;
 public class Conexion {
     private String url="jdbc:oracle:thin:@//localhost:1521/xe";
-    private String username="aula";
-    private String pass="aula";
+    private String username="casa";
+    private String pass="casa";
     private Connection con; 
     
     public Conexion() throws ClassNotFoundException, SQLException {    //constructor

@@ -192,10 +192,7 @@ public class Cocina_Canibal {
                                 muestraRecetas(con, busqueda, tipoBus);
                                 System.out.println("De entre los resultados, indica el índice de la receta que quieres borrar:");
                                 recetaElegida=compInput();
-                                borraModReceta(con, login, recetaElegida, 'b');//opción 'b' para borrar - aún falta comprobar que el que intenta borrar sea el propietario
-                                
-                                
-                                
+                                borraModReceta(con, login, recetaElegida, 'b');//opción 'b' para borrar
                             }
                             else{
                                 System.out.println("Sólo usuarios registrados.");
@@ -208,7 +205,25 @@ public class Cocina_Canibal {
                     case MODIFICAR://en obras                        
                         if(logged){//requiere login
                             System.out.println("Modificar Recetas.");
-                            //AQUI
+                            int recetaElegida=-1;
+                            System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
+                            do{
+                                System.out.print(">");
+                                tipoBus=teclado.next().charAt(0);
+                                if(tipoBus=='N')tipoBus='n';
+                                if(tipoBus=='E')tipoBus='e';
+                            }while(tipoBus!='n' && tipoBus!='e');
+                            if(tipoBus=='n') System.out.println("Búsqueda por Nombre: ");{
+                                busqueda=teclado.nextLine();
+                            }
+                            if(tipoBus=='e') System.out.println("Búsqueda por Etiqueta: ");{
+                                busqueda=teclado.next();                        
+                            }
+                            muestraRecetas(con, busqueda, tipoBus);
+                            System.out.println("De entre los resultados, indica el índice de la receta que quieres editar:");
+                            System.out.print(">");
+                            recetaElegida=compInput();
+                            borraModReceta(con, login, recetaElegida, 'm');//opción 'b' para borrar
                             
                         }
                         else {
