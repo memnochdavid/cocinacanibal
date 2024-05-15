@@ -112,6 +112,7 @@ public class Libreria {
         String ingre="";
         String pasos="";
         String cod="";
+        String tags="";
         int existe=0;
         if(opc=='n'){//busca por nombre
             //int   existe=Character.getNumericValue(con.selectToString("select count(*) from recetas where nombre='"+busqueda+"'").charAt(0));
@@ -123,13 +124,14 @@ public class Libreria {
             }
             else{
                 while(cont<=existe){
+                    tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+cont+")").replaceAll(" - \n", ", ");
                     creador=con.selectToString("select owner from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     nombre=con.selectToString("select nombre from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     desc=con.selectToString("select descripcion from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     ingre=con.selectToString("select ingredientes from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     pasos=con.selectToString("select pasos from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "").replaceAll(" - ", "\n");;
                     cod=con.selectToString("select cod from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
-                    if(!cod.equals("")) System.out.println("\nCódigo: "+cod+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+                    if(!cod.equals("")) System.out.println("\nCódigo: "+cod+"\nTags: "+tags+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
                     cont++;
                 }
             }
@@ -150,13 +152,14 @@ public class Libreria {
             }
             else{
                 while(cont<=existe){
+                    tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+cont+")").replaceAll(" - \n", ", ");
                     creador=con.selectToString("select owner from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
                     nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
                     desc=con.selectToString("select descripcion from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
                     ingre=con.selectToString("select ingredientes from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
                     pasos=con.selectToString("select pasos from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "").replaceAll(" - ", "\n");
                     cod=con.selectToString("select cod from recetas where cod="+cont).replaceAll(" - \n", "");
-                    if(!cod.equals("")) System.out.println("\nCódigo: "+cod+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+                    if(!cod.equals("")) System.out.println("\nCódigo: "+cod+"\nTags: "+tags+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
                     cont++;
                 }
             }
@@ -164,18 +167,32 @@ public class Libreria {
     }
     
     //borrar receta-----------------------------------------------------------------------------------------
-    /*
-    public static void borraModReceta(Conexion con, Usuario login, char opc){
-        boolean borrado=false;
+    
+    public static void borraModReceta(Conexion con, Usuario login, int chosen, char opc) throws SQLException{
+        String creador=con.selectToString("select owner from recetas where cod="+chosen).replaceAll(" - \n", "");
         boolean modif=false;
-        if(opc=='b'){
-            
+        boolean borrado=false;
+        boolean compOwnership=false;
+        if(creador.equals(login.getUsr())) compOwnership=true;
+        if(compOwnership || login.getLvl()==2){
+            if(opc=='b'){
+                String deleteDependencias="delete from rec_et where cod="+chosen;
+                String deleteRece="delete from recetas where cod="+chosen+" and owner='"+login.getUsr()+"'";
+                con.insert(deleteDependencias);
+                con.insert(deleteRece);
+                borrado=true;
+            }
+            if(opc=='m'){
+
+                String updateRece="";
+                con.insert(updateRece);
+                modif=true;
+            }
         }
-        if(opc=='m'){
-            
-        }
+        else System.out.println("No tienes permisos para borrar/editar esto.");
         if(borrado) System.out.println("Borrado con éxito.");
-    }*/
+        if(modif) System.out.println("Edición con éxito.");
+    }
     
     //pide ingredientes hasta que el usuario quiera parar, entonces los guarda todos en un String que devuelve
     public static String ingredientes() throws SQLException{

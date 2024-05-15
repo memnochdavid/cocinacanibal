@@ -174,8 +174,26 @@ public class Cocina_Canibal {
                     case ELIMINA_RECETA:
                         if(logged){//requiere login
                             if(login.getLvl()>0){//sólo el login con lvl 1 o 2
+                                int recetaElegida=-1;
+                                System.out.println("Eliminar Receta.");
+                                System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
+                                do{
+                                    System.out.print(">");
+                                    tipoBus=teclado.next().charAt(0);
+                                    if(tipoBus=='N')tipoBus='n';
+                                    if(tipoBus=='E')tipoBus='e';
+                                }while(tipoBus!='n' && tipoBus!='e');
+                                if(tipoBus=='n') System.out.println("Búsqueda por Nombre: ");{
+                                    busqueda=teclado.nextLine();
+                                }
+                                if(tipoBus=='e') System.out.println("Búsqueda por Etiqueta: ");{
+                                    busqueda=teclado.next();                        
+                                }
+                                muestraRecetas(con, busqueda, tipoBus);
+                                System.out.println("De entre los resultados, indica el índice de la receta que quieres borrar:");
+                                recetaElegida=compInput();
+                                borraModReceta(con, login, recetaElegida, 'b');//opción 'b' para borrar - aún falta comprobar que el que intenta borrar sea el propietario
                                 
-                                //AQUI
                                 
                                 
                             }
