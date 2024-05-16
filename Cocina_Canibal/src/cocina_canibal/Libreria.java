@@ -13,12 +13,12 @@ public class Libreria {
         int opcion;
         
         do{
-            System.out.println("--------------------------");
-            System.out.println("----- MENU de "+formatString("verde")+"Base de Datos"+formatString("reset")+" ------");
-            System.out.println("--------------------------");
+            System.out.println("==========================");
+            System.out.println("   MENU de "+formatString("verde")+"Base de Datos"+formatString("reset")+"  ");
+            System.out.println("==========================");
             System.out.println("1. Base de Datos - Set up");
             System.out.println("2. Continuar.");
-            System.out.print(">");
+            System.out.print("> ");
             opcion=compInput();
         }while(opcion<1 || opcion>2);
         opcion-=1;
@@ -32,16 +32,16 @@ public class Libreria {
         int opcion;
         
         do{
-            System.out.println("--------------------------");
-            System.out.println("----- MENU de "+formatString("verde")+"LOGIN"+formatString("reset")+" ------");
-            System.out.println("--------------------------");
+            System.out.println("==========================");
+            System.out.println("      MENU de "+formatString("verde")+"LOGIN"+formatString("reset")+"      ");
+            System.out.println("==========================");
             System.out.println("1. Registrar Usuario.");
             System.out.println("2. Login.");
             System.out.println("3. Cerrar Sesión.");
             System.out.println("4. Usar sin registrar.");
             System.out.println("5. Ver todos los usuarios.");
             System.out.println("6. SALIR.");
-            System.out.print(">");
+            System.out.print("> ");
             opcion=compInput();
         }while(opcion<1 || opcion>6);
         opcion-=1;
@@ -53,9 +53,9 @@ public class Libreria {
         MenuReceta[] opciones=MenuReceta.values();
         int opcion;
         do{
-            System.out.println("--------------------------");
-            System.out.println("---MENU de \033[34mRecetas"+formatString("reset")+"---");
-            System.out.println("--------------------------");
+            System.out.println("==========================");
+            System.out.println("   MENU de \033[34mRecetas"+formatString("reset"));
+            System.out.println("==========================");
             System.out.println("1. Crea Receta.");
             System.out.println("2. Busca Receta.");
             System.out.println("3. Elimina Receta.");
@@ -131,7 +131,10 @@ public class Libreria {
                     ingre=con.selectToString("select ingredientes from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     pasos=con.selectToString("select pasos from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "").replaceAll(" - ", "\n");;
                     cod=con.selectToString("select cod from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
-                    if(!cod.equals("")) System.out.println("\nCódigo: "+cod+"\nTags: "+tags+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+                    if(!cod.equals("")){
+                        System.out.println("\n=======================================");
+                        System.out.println("Código: "+cod+"\nTags: "+tags+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+                    }
                     cont++;
                 }
             }
@@ -158,8 +161,8 @@ public class Libreria {
                     desc=con.selectToString("select descripcion from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
                     ingre=con.selectToString("select ingredientes from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
                     pasos=con.selectToString("select pasos from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "").replaceAll(" - ", "\n");
-                    cod=con.selectToString("select cod from recetas where cod="+cont).replaceAll(" - \n", "");
-                    if(!cod.equals("")) System.out.println("\nCódigo: "+cod+"\nTags: "+tags+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+                    cod=con.selectToString("select cod from recetas where cod in (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'))").replaceAll(" - \n", "");
+                    if(!nombre.equals("")) System.out.println("\nCódigo: "+cod+"\nTags: "+tags+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
                     cont++;
                 }
             }
@@ -217,6 +220,7 @@ public class Libreria {
                                 nombre=teclado.nextLine();
                                 updateRece="update recetas set nombre='"+nombre+"' where cod="+chosen;
                                 System.out.println("Modificado con éxito.");
+                                modif=true;
                                 break;
                             case 2:
                                 teclado.nextLine();
@@ -225,26 +229,26 @@ public class Libreria {
                                 desc=teclado.nextLine();
                                 updateRece="update recetas set descripcion='"+desc+"' where cod="+chosen;
                                 System.out.println("Modificado con éxito.");
+                                modif=true;
                                 break;
                             case 3:
                                 teclado.nextLine();
                                 ingre=ingredientes();
                                 updateRece="update recetas set ingredientes='"+ingre+"' where cod="+chosen;
                                 System.out.println("Modificado con éxito.");
+                                modif=true;
                                 break;
                             case 4:
                                 teclado.nextLine();
                                 pasos=pasosReceta();
                                 updateRece="update recetas set pasos='"+pasos+"' where cod="+chosen;
                                 System.out.println("Modificado con éxito.");
+                                modif=true;
                                 break;
                             case 5:
                                 //teclado.nextLine();
-                                System.out.println("Edición de Etiquetas no implementada aún.");
-                                /*
-                                updateRece="";
-                                System.out.println("Modificado con éxito.");
-                                */
+                                modifEtiquetas(con, chosen);
+                                modif=false;
                                 break;
                             case 6://se modifican todo de la receta menos el código y el el creador
                                 teclado.nextLine();
@@ -258,14 +262,17 @@ public class Libreria {
                                 ingre=ingredientes();
                                 System.out.println("Nuevos Pasos:");
                                 pasos=pasosReceta();
-                                System.out.println("Edición de Etiquetas no implementada aún.");
-                                updateRece="update recetas set nombre='"+nombre+"', descripcion='"+desc+"', ingredientes='"+ingre+"', pasos='"+pasos+"', tags='"+tags+"' where cod="+chosen;
+                                modifEtiquetas(con, chosen);
+                                updateRece="update recetas set nombre='"+nombre+"', descripcion='"+desc+"', ingredientes='"+ingre+"', pasos='"+pasos+"' where cod="+chosen;
                                 System.out.println("Modificado con éxito.");
+                                modif=true;
                                 break;
                             case 7:
                                 terminado=true;
+                                modif=false;
                                 break;
                             default:
+                                modif=false;
                                 break;
 
                         }
@@ -277,7 +284,7 @@ public class Libreria {
                         if(end=='s') terminado=true;
                     }while(terminado == false);
                 //}while(!terminado);
-                con.insert(updateRece);
+                if(modif) con.insert(updateRece);
                 modif=true;
             }
         }
@@ -287,7 +294,7 @@ public class Libreria {
     }
     
     //pide ingredientes hasta que el usuario quiera parar, entonces los guarda todos en un String que devuelve
-    public static String ingredientes() throws SQLException{
+    public static String ingredientes(){
         Scanner sc = new Scanner(System.in, "ISO-8859-2");
         int cont = 0; //Variable que va a ir contabilizando el numero de ingredientes
         String[] ingredientes = new String[25];
@@ -296,13 +303,16 @@ public class Libreria {
         String nombre;
         char opc;
         //sc.nextLine();
+        System.out.println("================================");
         System.out.println("\nVamos a añadir ingresientes..");
         do{
-            System.out.println("\nIntroduce el nombre del ingrediente: ");
+            System.out.println("Introduce el nombre del ingrediente: ");
+            System.out.print(">");
             nombre = sc.next();
             ingredientes[cont] = nombre;
             cont++;
             System.out.println("\nDeseas añadir otro ingrediente? S/N");
+            System.out.print(">");
             opc = sc.next().toLowerCase().charAt(0);
             if(opc == 's'|| opc=='S') salir = true;
             else if(opc == 'n' || opc=='N') salir = false;
@@ -327,6 +337,7 @@ public class Libreria {
         String res="";
         String paso;
         char opc;
+        System.out.println("================================");
         System.out.println("\nVamos a enumerar los pasos de esta receta...");
         do{
             sc.nextLine();
@@ -576,6 +587,40 @@ public class Libreria {
             conEt++;
         }while(conEt<3);
     }
+    
+    public static void modifEtiquetas(Conexion con, int cod_receta) throws SQLException{
+        //tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+cod_receta+")").replaceAll(" - \n", ", ");
+        String tags="";
+        Etiquetas[] listaTags=Etiquetas.values();
+        /*for(int i=1; i<listaTags.length; i++){
+            System.out.println(i+". "+listaTags.toString());            
+        }*/
+        int[] opcEt = new int[3];
+        int conEt = 0;
+        boolean usada = false;
+        int eti = 0;
+        con.insert("delete from rec_et where cod = "+cod_receta+"");
+        do{
+            //int codRec = Character.getNumericValue(con.selectToString("select cod from recetas where recetas.nombre='"+recetaCrea.getNombre()+"' and owner='"+login.getUsr()+"'").charAt(0));
+            do{
+                usada = false;
+                eti=eligeEtiquetas(opcEt);//etiqueta 1 - apañao
+                for(int i=0; i<opcEt.length; i++){
+                    if(opcEt[i] == eti){
+                        usada = true;
+                        System.out.println("Ya has usado esta etiqueta!");
+                    }
+                }
+            }while(usada);
+
+            opcEt[conEt] = eti;
+            String insertRE = "insert into rec_et (cod, id) values ("+cod_receta+", "+eti+")";
+            con.insert(insertRE);
+            conEt++;
+        }while(conEt<3);
+        
+    }
+    
     
 }
 

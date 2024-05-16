@@ -59,7 +59,8 @@ public class Cocina_Canibal {
                         break;
 
                     case COMP_LOGIN: //inicia sesión
-                        System.out.println("\033[34m---COMPRUEBA USUARIO---"+formatString("reset"));
+                        System.out.println("\033[34m======================="+formatString("reset"));
+                        System.out.println("\033[34m   COMPRUEBA USUARIO"+formatString("reset"));
                         System.out.println("\u001B[35mUsuario:\033[30m");
                         System.out.print(">");
                         usr=teclado.next();
@@ -70,6 +71,7 @@ public class Cocina_Canibal {
                         System.out.println("\u001B[35meMail:\033[30m");
                         System.out.print(">");
                         mail=teclado.next();
+                        System.out.println("\033[34m======================="+formatString("reset"));
                         lvl=compruebaPrivilegiosCredenciales(con, usr, pass);//recibe un int correspondiente al lvl de acceso del usuario a comprobar. Si no existe, el lvl es 0. Si es un admin, el lvl es 2, si es un usuario ya registrado, el lvl de acceso es 1
                         if(lvl==0){//no existe
                             login=new Usuario(con, "base","base","base", 0, true);
@@ -128,8 +130,13 @@ public class Cocina_Canibal {
                         if(logged){//requiere login
                             if(login.getLvl()>0){//sólo el login con lvl 1 o 2
                                 teclado.nextLine();
-                                System.out.println("Nombre de la receta: ");
-                                nom_receta=teclado.nextLine();
+                                int existe = 0;
+                                System.out.println("======================");
+                                do{
+                                    System.out.println("Nombre de la receta: ");
+                                    nom_receta=teclado.nextLine();
+                                    existe = Character.getNumericValue(con.selectToString("select count(*) from recetas where recetas.nombre='"+nom_receta+"' and owner='"+login.getUsr()+"'").charAt(0));
+                                }while(existe>0);
                                 System.out.println("Descripción de la receta: ");
                                 descripcion=teclado.nextLine();
                                 ingredientes = ingredientes();//guarda todos los ingredientes en un String, separados por coma
@@ -155,6 +162,7 @@ public class Cocina_Canibal {
                         teclado.nextLine();
                         String busqueda="";
                         char tipoBus=' ';
+                        System.out.println("======================");
                         System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
                         do{
                             System.out.print(">");
@@ -173,6 +181,7 @@ public class Cocina_Canibal {
 
                     case ELIMINA_RECETA:
                         if(logged){//requiere login
+                            System.out.println("======================");
                             if(login.getLvl()>0){//sólo el login con lvl 1 o 2
                                 int recetaElegida=-1;
                                 System.out.println("Eliminar Receta.");
