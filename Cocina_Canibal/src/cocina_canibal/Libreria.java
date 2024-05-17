@@ -3,7 +3,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 public class Libreria {
     
     //Menu Base de Datos
@@ -13,9 +15,9 @@ public class Libreria {
         int opcion;
         
         do{
-            System.out.println("==========================");
+            System.out.println(formatString("verde")+"=========================="+formatString("reset"));
             System.out.println("   MENU de "+formatString("verde")+"Base de Datos"+formatString("reset")+"  ");
-            System.out.println("==========================");
+            System.out.println(formatString("verde")+"=========================="+formatString("reset"));
             System.out.println("1. Base de Datos - Set up");
             System.out.println("2. Continuar.");
             System.out.print("> ");
@@ -32,9 +34,9 @@ public class Libreria {
         int opcion;
         
         do{
-            System.out.println("==========================");
+            System.out.println(formatString("verde")+"=========================="+formatString("reset"));
             System.out.println("      MENU de "+formatString("verde")+"LOGIN"+formatString("reset")+"      ");
-            System.out.println("==========================");
+            System.out.println(formatString("verde")+"=========================="+formatString("reset"));
             System.out.println("1. Registrar Usuario.");
             System.out.println("2. Login.");
             System.out.println("3. Cerrar Sesión.");
@@ -53,24 +55,21 @@ public class Libreria {
         MenuReceta[] opciones=MenuReceta.values();
         int opcion;
         do{
-            System.out.println("==========================");
+            System.out.println(formatString("verde")+"=========================="+formatString("reset"));
             System.out.println("   MENU de \033[34mRecetas"+formatString("reset"));
-            System.out.println("==========================");
+            System.out.println(formatString("verde")+"=========================="+formatString("reset"));
             System.out.println("1. Crea Receta.");
             System.out.println("2. Busca Receta.");
             System.out.println("3. Elimina Receta.");
             System.out.println("4. Modifica Receta.");            
-            System.out.println("5. SALIR.");
+            System.out.println("5. Puntuar Recetas..");
+            System.out.println("6. SALIR.");
             System.out.print(">");
             opcion=compInput();
-        }while(opcion<1 || opcion>5);
+        }while(opcion<1 || opcion>6);
         opcion-=1;
         return opciones[opcion];
-    }
-    
-    
-    
-    
+    }  
     
     //comprueba si existe algún usuario con el nombre que recibe por el String
     public static boolean checkUsuario(String usr, Conexion con) throws SQLException{
@@ -104,18 +103,11 @@ public class Libreria {
         else System.out.println("Sólo para admin.");
     }
     
-    //muestra recetas - opc u(una) - opc a(all)
+    //muestra las recetas - recibe un String búsqueda y un char opc que especifica el modo de búsqueda, si por tags o por nombre 
     public static void muestraRecetas(Conexion con, String busqueda, char opc) throws SQLException{
-        String creador="";
-        String nombre="";
-        String desc="";
-        String ingre="";
-        String pasos="";
-        String cod="";
-        String tags="";
+        String creador="", nombre="", desc="", ingre="", pasos="", cod="", tags="";
         int existe=0;
         if(opc=='n'){//busca por nombre
-            //int   existe=Character.getNumericValue(con.selectToString("select count(*) from recetas where nombre='"+busqueda+"'").charAt(0));
             existe=Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
             int cont=1;
             if(existe==0){
@@ -169,8 +161,7 @@ public class Libreria {
         }
     }
     
-    //borrar receta-----------------------------------------------------------------------------------------
-    
+    //borrar y/o modificar receta    
     public static void borraModReceta(Conexion con, Usuario login, int chosen, char opc) throws SQLException{
         String creador=con.selectToString("select owner from recetas where cod="+chosen).replaceAll(" - \n", "");
         boolean modif=false;
@@ -363,6 +354,106 @@ public class Libreria {
         return res;
     }
     
+    public static int eligeEtiquetas(int[] opcEt){
+        Scanner teclado=new Scanner(System.in);
+        Etiquetas[] etiqueta=Etiquetas.values();
+        int opcion;
+        boolean noMostrar = false; //Para que muestrre o no
+        do{
+            System.out.println("--------------------------");
+            System.out.println("------ ETIQUETAS ------");
+            System.out.println("--------------------------");
+            for(int i=1; i<etiqueta.length; i++){// i empieza en 1 para evitar la posición cero, que contiene una entrada dummy. Así se evita que la primera opción aparezca en rojo
+                noMostrar = false; //Reinicio variable
+                for(int j=0; j<opcEt.length; j++){
+                    if(opcEt[j] == i){
+                        noMostrar = true;
+                    }
+                }
+                if(noMostrar) System.out.println("\033[31m"+(i)+".- "+etiqueta[i].toString()+"\033[30m");
+                if(!noMostrar) System.out.println("\033[32m"+(i)+".- "+etiqueta[i].toString()+"\033[30m");
+            }
+            System.out.print("\n>");
+            opcion=compInput();
+        }while(opcion<1 || opcion>etiqueta.length);
+        return opcion;
+    }
+    
+    public static void registraEtiquetas(Conexion con, Usuario login, Receta recetaCrea) throws SQLException{
+        int[] opcEt = new int[3];
+        int conEt = 0;
+        boolean usada = false;
+        int eti = 0;
+        do{
+            int codRec = Character.getNumericValue(con.selectToString("select cod from recetas where recetas.nombre='"+recetaCrea.getNombre()+"' and owner='"+login.getUsr()+"'").charAt(0));
+            do{
+                usada = false;
+                eti=eligeEtiquetas(opcEt);//etiqueta 1 - apañao
+                for(int i=0; i<opcEt.length; i++){
+                    if(opcEt[i] == eti){
+                        usada = true;
+                        System.out.println("Ya has usado esta etiqueta!");
+                    }
+                }
+            }while(usada);
+
+            opcEt[conEt] = eti;
+            String insertRE = "insert into rec_et (cod, id) values ("+codRec+", "+eti+")";
+            con.insert(insertRE);
+            conEt++;
+        }while(conEt<3);
+    }
+    
+    //borra los tags de la receta con 'cod' que recibe, para luego volver a preguntar por ellas, y las inserta
+    public static void modifEtiquetas(Conexion con, int cod_receta) throws SQLException{
+        String tags="";
+        Etiquetas[] listaTags=Etiquetas.values();
+        int[] opcEt = new int[3];
+        int conEt = 0;
+        boolean usada = false;
+        int eti = 0;
+        con.insert("delete from rec_et where cod = "+cod_receta+"");
+        do{
+            do{
+                usada = false;
+                eti=eligeEtiquetas(opcEt);//etiqueta 1 - apañao
+                for(int i=0; i<opcEt.length; i++){
+                    if(opcEt[i] == eti){
+                        usada = true;
+                        System.out.println("Ya has usado esta etiqueta!");
+                    }
+                }
+            }while(usada);
+
+            opcEt[conEt] = eti;
+            String insertRE = "insert into rec_et (cod, id) values ("+cod_receta+", "+eti+")";
+            con.insert(insertRE);
+            conEt++;
+        }while(conEt<3);
+        
+    }
+    
+    //pregunta al usuario cuántas estrellas asignar a una receta - recibe el int 'cod' de la receta a puntuar - después inserta la puntuación en la BD a la receta indicada
+    public static void asignaEstrellas(Conexion con, int cod_receta) throws SQLException{
+        Scanner teclado=new Scanner(System.in);
+        int stars=-1;
+        String insert_estrellas="";
+        System.out.println("Puntúa esta receta con estrellas (1-5):");
+        do{
+            System.out.print(">");
+            stars=teclado.nextInt();
+        }while(stars<1 || stars>5);
+        String consulta = "select estrellas from recetas where cod='"+cod_receta+"'";
+        ResultSet rs = con.select2(consulta);
+        while(rs.next()){
+            stars += rs.getInt(1);
+        }
+        
+        insert_estrellas="update recetas set estrellas="+stars+" where cod="+cod_receta;
+        
+        con.insert(insert_estrellas);
+    }
+    
     
     //cifra el pass
     public static String cifrarContrasena(String contrasena){
@@ -393,6 +484,16 @@ public class Libreria {
         return trun;
     }
     
+    //valida el String que recibe como un email válido o no
+    public static boolean validaCorreo(String email){
+        String check="^[a-zA-Z0-9_!#$%&amp;'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+        Pattern pattern = Pattern.compile(check);
+        if(pattern.matches(check, email)) return true;
+        else{
+            System.out.println("Correo no váildo.");
+            return false;
+        }
+    }
     
     public static boolean validaContraseña(String contraseña, String usuario){
         boolean valida = false;
@@ -447,9 +548,12 @@ public class Libreria {
         return valida;
     }
     
-    public static void BDsetUp(Conexion con) throws SQLException{//crea las tablas necesarias en en la BD y los usuarios 'admin' y 'base' para que no sea necesario abrir ORACLE
+    //crea las tablas necesarias en en la BD y los usuarios 'admin' y 'base' para que no sea necesario abrir ORACLE
+    public static void BDsetUp(Conexion con) throws SQLException{
         String tablaUsu = "create table usuarios (usr 	varchar2(25),pass    varchar2(100) not null,mail    varchar2(50),lvl     number(1) check (lvl between 0 and 2),constraint pk_usuarios primary key (usr))";
-        String tablaRece = "create table recetas(cod	    integer generated always as identity (start with 1 increment by 1),owner 	varchar2(25),nombre  varchar2(25),descripcion    varchar2(100) not null,ingredientes varchar2(550), pasos   varchar2(500), constraint pk_recetas primary key (cod),constraint fk_rec_usu foreign key (owner) references usuarios(usr))";
+        //original - funciona - NO BORRAR- String tablaRece = "create table recetas(cod	    integer generated always as identity (start with 1 increment by 1),owner 	varchar2(25),nombre  varchar2(25),descripcion    varchar2(100) not null,ingredientes varchar2(550), pasos   varchar2(500), constraint pk_recetas primary key (cod),constraint fk_rec_usu foreign key (owner) references usuarios(usr))";
+        //nuevo "create table con estrellas"
+        String tablaRece = "create table recetas(cod integer generated always as identity (start with 1 increment by 1), owner 	varchar2(25), nombre  varchar2(25), descripcion    varchar2(100) not null, ingredientes varchar2(550), pasos   varchar2(500), estrellas number(1,0) check (estrellas between 1 and 5), constraint pk_recetas primary key (cod), constraint fk_rec_usu foreign key (owner) references usuarios(usr))";
         String tablaEtiq ="create table etiqueta (id integer generated always as identity (start with 1 increment by 1) primary key, nom varchar2(30))";
         String tablaRec_Et="create table rec_et (cod	    number(3), id      integer, constraint pk_rec_et primary key(cod, id),constraint fk_rec_re foreign key (cod) references recetas(cod))";
         String admin = "insert into usuarios values ('admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'admin@admin.com', 2)";
@@ -484,7 +588,8 @@ public class Libreria {
         }
     }
     
-    public static void destroyAll(Conexion con) throws SQLException{//destruye todo a su paso -CUIDADORRRLL fistro de la pradera
+    //destruye todo a su paso -CUIDADORRRLL fistro de la pradera
+    public static void destroyAll(Conexion con) throws SQLException{
         String err="ninguno";
         String dropRec_Et="drop table rec_et cascade constraints";
         String dropEtiq="drop table etiqueta cascade constraints";
@@ -536,90 +641,6 @@ public class Libreria {
         
     }
     
-    
-    
-    public static int eligeEtiquetas(int[] opcEt){
-        Scanner teclado=new Scanner(System.in);
-        Etiquetas[] etiqueta=Etiquetas.values();
-        int opcion;
-        boolean noMostrar = false; //Para que muestrre o no
-        do{
-            System.out.println("--------------------------");
-            System.out.println("------ ETIQUETAS ------");
-            System.out.println("--------------------------");
-            for(int i=1; i<etiqueta.length; i++){// i empieza en 1 para evitar la posición cero, que contiene una entrada dummy. Así se evita que la primera opción aparezca en rojo
-                noMostrar = false; //Reinicio variable
-                for(int j=0; j<opcEt.length; j++){
-                    if(opcEt[j] == i){
-                        noMostrar = true;
-                    }
-                }
-                if(noMostrar) System.out.println("\033[31m"+(i)+".- "+etiqueta[i].toString()+"\033[30m");
-                if(!noMostrar) System.out.println("\033[32m"+(i)+".- "+etiqueta[i].toString()+"\033[30m");
-            }
-            System.out.print("\n>");
-            opcion=compInput();
-        }while(opcion<1 || opcion>etiqueta.length);
-        return opcion;
-    }
-    
-    public static void registraEtiquetas(Conexion con, Usuario login, Receta recetaCrea) throws SQLException{
-        int[] opcEt = new int[3];
-        int conEt = 0;
-        boolean usada = false;
-        int eti = 0;
-        do{
-            int codRec = Character.getNumericValue(con.selectToString("select cod from recetas where recetas.nombre='"+recetaCrea.getNombre()+"' and owner='"+login.getUsr()+"'").charAt(0));
-            do{
-                usada = false;
-                eti=eligeEtiquetas(opcEt);//etiqueta 1 - apañao
-                for(int i=0; i<opcEt.length; i++){
-                    if(opcEt[i] == eti){
-                        usada = true;
-                        System.out.println("Ya has usado esta etiqueta!");
-                    }
-                }
-            }while(usada);
-
-            opcEt[conEt] = eti;
-            String insertRE = "insert into rec_et (cod, id) values ("+codRec+", "+eti+")";
-            con.insert(insertRE);
-            conEt++;
-        }while(conEt<3);
-    }
-    
-    public static void modifEtiquetas(Conexion con, int cod_receta) throws SQLException{
-        //tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+cod_receta+")").replaceAll(" - \n", ", ");
-        String tags="";
-        Etiquetas[] listaTags=Etiquetas.values();
-        /*for(int i=1; i<listaTags.length; i++){
-            System.out.println(i+". "+listaTags.toString());            
-        }*/
-        int[] opcEt = new int[3];
-        int conEt = 0;
-        boolean usada = false;
-        int eti = 0;
-        con.insert("delete from rec_et where cod = "+cod_receta+"");
-        do{
-            //int codRec = Character.getNumericValue(con.selectToString("select cod from recetas where recetas.nombre='"+recetaCrea.getNombre()+"' and owner='"+login.getUsr()+"'").charAt(0));
-            do{
-                usada = false;
-                eti=eligeEtiquetas(opcEt);//etiqueta 1 - apañao
-                for(int i=0; i<opcEt.length; i++){
-                    if(opcEt[i] == eti){
-                        usada = true;
-                        System.out.println("Ya has usado esta etiqueta!");
-                    }
-                }
-            }while(usada);
-
-            opcEt[conEt] = eti;
-            String insertRE = "insert into rec_et (cod, id) values ("+cod_receta+", "+eti+")";
-            con.insert(insertRE);
-            conEt++;
-        }while(conEt<3);
-        
-    }
     
     
 }

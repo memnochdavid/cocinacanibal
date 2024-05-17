@@ -49,8 +49,10 @@ public class Cocina_Canibal {
                             }while(!validaContr);                           
                             pass=cifrarContrasena(pass);
                             System.out.println("\u001B[35meMail:\033[30m");
-                            System.out.print(">");
-                            mail=teclado.next();
+                            do{
+                                System.out.print(">");
+                                mail=teclado.next();
+                            }while(!validaCorreo(mail));
                             usuarioCrea=new Usuario(con,usr,pass,mail,1, false);//genera el objeto para luego registrarlo en la BD, falso porque crea un usuario, no es un login
                             usuarioCrea.oracleRegistraUsuario(con);//lo registra en la base de datos
                             usuarioCrea=null;//se deja a null porque ya no es necesario el objeto
@@ -68,22 +70,22 @@ public class Cocina_Canibal {
                         System.out.print(">");
                         pass=teclado.next();
                         pass=cifrarContrasena(pass);//se cifra
-                        System.out.println("\u001B[35meMail:\033[30m");
-                        System.out.print(">");
-                        mail=teclado.next();
+                        //System.out.println("\u001B[35meMail:\033[30m");
+                        //System.out.print(">");
+                        //mail=teclado.next();
                         System.out.println("\033[34m======================="+formatString("reset"));
                         lvl=compruebaPrivilegiosCredenciales(con, usr, pass);//recibe un int correspondiente al lvl de acceso del usuario a comprobar. Si no existe, el lvl es 0. Si es un admin, el lvl es 2, si es un usuario ya registrado, el lvl de acceso es 1
                         if(lvl==0){//no existe
-                            login=new Usuario(con, "base","base","base", 0, true);
+                            login=new Usuario(con, "base","","base", 0, true);
                             System.out.println("Usuario base.");
                         }
                         if(lvl==1){//ha encontrado coincidencia y crea el objeto login de la clase Usuario con lvl de acceso 1
-                            login=new Usuario(con, usr,pass,mail, 1, true);
+                            login=new Usuario(con, usr,pass,"", 1, true);
                             System.out.println("Login exitoso.\n");
 
                         }
                         if(lvl==2){// credenciales de admin para objeto login de la clase Usuario, lvl de acceso 2
-                            login=new Usuario(con, usr,pass,mail, 2, true);
+                            login=new Usuario(con, usr,pass,"", 2, true);
                             System.out.println("Usuario admin.");
                         }
                         logged=true;
@@ -142,8 +144,6 @@ public class Cocina_Canibal {
                                 ingredientes = ingredientes();//guarda todos los ingredientes en un String, separados por coma
                                 pasos=pasosReceta();
                                 recetaCrea=new Receta(con, login, nom_receta, descripcion, ingredientes, pasos);
-                                //System.out.println(nom_receta);
-                                //System.out.println(login.getUsr());
                                 recetaCrea.oracleRegistraReceta(con);//guarda en la BD
                                 registraEtiquetas(con, login, recetaCrea);
                                 recetaCrea=null;//destruye el objeto para volver a ser usado cuando haga falta
@@ -233,6 +233,34 @@ public class Cocina_Canibal {
                             System.out.print(">");
                             recetaElegida=compInput();
                             borraModReceta(con, login, recetaElegida, 'm');//opción 'b' para borrar
+                            
+                        }
+                        else {
+                            System.out.println("Login necesario.");
+                        }
+                        break;
+                    case PUNTUAR:
+                        if(logged){//requiere login
+                            System.out.println("Puntuar Recetas.");
+                            int recetaElegida=-1;
+                            System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
+                            do{
+                                System.out.print(">");
+                                tipoBus=teclado.next().charAt(0);
+                                if(tipoBus=='N')tipoBus='n';
+                                if(tipoBus=='E')tipoBus='e';
+                            }while(tipoBus!='n' && tipoBus!='e');
+                            if(tipoBus=='n') System.out.println("Búsqueda por Nombre: ");{
+                                busqueda=teclado.nextLine();
+                            }
+                            if(tipoBus=='e') System.out.println("Búsqueda por Etiqueta: ");{
+                                busqueda=teclado.next();                        
+                            }
+                            muestraRecetas(con, busqueda, tipoBus);
+                            System.out.println("De entre los resultados, indica el índice de la receta que quieres puntuar:");
+                            System.out.print(">");
+                            recetaElegida=compInput();
+                            asignaEstrellas(con, recetaElegida);//en obras
                             
                         }
                         else {

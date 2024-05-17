@@ -3,8 +3,8 @@ package cocina_canibal;
 import java.sql.*;
 public class Conexion {
     private String url="jdbc:oracle:thin:@//localhost:1521/xe";
-    private String username="casa";
-    private String pass="casa";
+    private String username="aula";
+    private String pass="aula";
     private Connection con; 
     
     public Conexion() throws ClassNotFoundException, SQLException {    //constructor
@@ -25,6 +25,13 @@ public class Conexion {
             System.out.println("");
         }
     }
+    
+    public ResultSet select2(String str) throws SQLException{
+        Statement st=con.createStatement();
+        ResultSet rs=st.executeQuery(str);
+        return rs;
+    }
+    
     public String selectToString(String str) throws SQLException{ //igual que el método de arriba, pero devuelve la consulta en un String
         Statement st=con.createStatement();
         ResultSet rs=st.executeQuery(str);
