@@ -106,7 +106,7 @@ public class Libreria {
     //muestra las recetas - recibe un String búsqueda y un char opc que especifica el modo de búsqueda, si por tags o por nombre 
     public static void muestraRecetas(Conexion con, String busqueda, char opc) throws SQLException{
         String creador="", nombre="", desc="", ingre="", pasos="", cod="", tags="";
-        int existe=0;
+        int existe=0, seleccion=-1;
         if(opc=='n'){//busca por nombre
             existe=Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
             int cont=1;
@@ -116,19 +116,18 @@ public class Libreria {
             }
             else{
                 while(cont<=existe){
-                    tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+cont+")").replaceAll(" - \n", ", ");
-                    creador=con.selectToString("select owner from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     nombre=con.selectToString("select nombre from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
-                    desc=con.selectToString("select descripcion from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
-                    ingre=con.selectToString("select ingredientes from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
-                    pasos=con.selectToString("select pasos from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "").replaceAll(" - ", "\n");;
                     cod=con.selectToString("select cod from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     if(!cod.equals("")){
                         System.out.println("\n=======================================");
-                        System.out.println("Código: "+cod+"\nTags: "+tags+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+                        System.out.println("Código: "+cod+"\nNombre: "+nombre);
                     }
                     cont++;
                 }
+                System.out.println("Selecciona la receta que deseas ver:");
+                seleccion=compInput();
+                desglosaReceta(con, seleccion,  busqueda,  0,'n');
+                
             }
         }
         if(opc=='e'){//busca por etiqueta
@@ -146,20 +145,49 @@ public class Libreria {
                 System.out.println("No existe la Etiqueta '"+busqueda+"'.");
             }
             else{
-                while(cont<=existe){
-                    tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+cont+")").replaceAll(" - \n", ", ");
-                    creador=con.selectToString("select owner from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
-                    nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
-                    desc=con.selectToString("select descripcion from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
-                    ingre=con.selectToString("select ingredientes from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");
-                    pasos=con.selectToString("select pasos from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "").replaceAll(" - ", "\n");
+                while(cont<=existe){                    
+                    nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");                    
                     cod=con.selectToString("select cod from recetas where cod in (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'))").replaceAll(" - \n", "");
-                    if(!nombre.equals("")) System.out.println("\nCódigo: "+cod+"\nTags: "+tags+"\nCreador: "+creador+"\nNombre: "+nombre+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+                    if(!nombre.equals("")) System.out.println("Código: "+cod+"\nNombre: "+nombre);;
                     cont++;
                 }
+                System.out.println("Selecciona la receta que deseas ver:");
+                seleccion=compInput();
+                desglosaReceta(con, seleccion,  busqueda,  EtiquetaFound,'e');
             }
         }
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    //desglosa la búsqueda de una receta seleccionada - //este método se va a llamar cuando ya se ha comprobado que la receta en cuestión existe
+    public static void desglosaReceta(Conexion con, int indice, String busqueda, int EtiquetaFound,char opc) throws SQLException{
+        String creador="", desc="", ingre="", pasos="", tags="";
+        int existe=-1;
+        if(opc=='n'){
+            tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
+            creador=con.selectToString("select owner from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            desc=con.selectToString("select descripcion from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            ingre=con.selectToString("select ingredientes from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            pasos=con.selectToString("select pasos from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            System.out.println("\nTags: "+tags+"\nCreador: "+creador+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+        }
+        if(opc=='e'){
+            tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
+            creador=con.selectToString("select owner from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "");
+            desc=con.selectToString("select descripcion from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "");
+            ingre=con.selectToString("select ingredientes from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "");
+            pasos=con.selectToString("select pasos from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            System.out.println("\nTags: "+tags+"\nCreador: "+creador+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);            
+        }
+    }
+    
+    
     
     //borrar y/o modificar receta    
     public static void borraModReceta(Conexion con, Usuario login, int chosen, char opc) throws SQLException{

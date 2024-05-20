@@ -161,6 +161,7 @@ public class Cocina_Canibal {
                     case BUSCA_RECETA:                        
                         teclado.nextLine();
                         String busqueda="";
+                        int indice=-1;
                         char tipoBus=' ';
                         System.out.println("======================");
                         System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
@@ -176,7 +177,7 @@ public class Cocina_Canibal {
                         if(tipoBus=='e') System.out.println("Búsqueda por Etiqueta: ");{
                             busqueda=teclado.next();                        
                         }
-                        muestraRecetas(con, busqueda, tipoBus);
+                        muestraRecetas(con, busqueda, tipoBus);                        
                         break;
 
                     case ELIMINA_RECETA:
