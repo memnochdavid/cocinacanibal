@@ -237,8 +237,8 @@ public class Libreria {
                 //System.out.println("hola");
                 System.out.println("Selecciona la receta que deseas ver:");
                 seleccion=compInput();
-                
-                //desglosaReceta(con, seleccion,  busqueda,  EtiquetaFound,'e');
+                int codRec = Integer.parseInt(cod);
+                desglosaReceta(con, seleccion,  busqueda,  codRec,'e');
             }
         }
     
