@@ -225,9 +225,14 @@ public class Cocina_Canibal {
                                 contEti++;
                                 if(opcEti=='n') salirBusquedaEtiqueta=true;
                                 
-                            }while(!salirBusquedaEtiqueta || contEti<etiquetas.length);
+                            }while(!salirBusquedaEtiqueta && contEti<etiquetas.length);
+                            if(contEti == 1){
+                                etiquetas[1] = etiquetas[0];
+                                etiquetas[2] = etiquetas[0];
+                            }
+                            if(contEti == 2) etiquetas[2] = etiquetas[0];
                             System.out.println("Cantidad array etiquetas: "+contEti);
-                            busquedaEti(con, etiquetas, busqueda);      
+                            busquedaEti(con, etiquetas, busqueda, contEti);      
                             
                             
                         }
