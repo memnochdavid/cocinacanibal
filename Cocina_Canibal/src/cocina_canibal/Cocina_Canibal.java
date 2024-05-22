@@ -18,6 +18,7 @@ public class Cocina_Canibal {
         Receta recetaCrea;
         Conexion con=new Conexion();
        //devuelveEtiquetas();
+        System.out.println("Hola!!");
         do{
             do{
                 opcionIni=menuIni();
