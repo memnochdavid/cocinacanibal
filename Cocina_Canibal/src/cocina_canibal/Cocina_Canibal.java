@@ -18,7 +18,6 @@ public class Cocina_Canibal {
         Receta recetaCrea;
         Conexion con=new Conexion();
        //devuelveEtiquetas();
-        System.out.println("Hola!!");
         do{
             do{
                 opcionIni=menuIni();
@@ -159,26 +158,79 @@ public class Cocina_Canibal {
                         }
                         break;
 
-                    case BUSCA_RECETA:                        
-                        teclado.nextLine();
-                        String busqueda="";
+                    case BUSCA_RECETA:   
+                        String busqueda;
+                        String[] etiquetas = new String[3];
+                        etiquetas[0]="";
+                        etiquetas[1]="";
+                        etiquetas[2]="";
                         int indice=-1;
+                        int contEti = 0;
                         char tipoBus=' ';
+                        teclado.nextLine();
                         System.out.println("======================");
                         System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
+                        //System.out.println("hola");
                         do{
                             System.out.print(">");
                             tipoBus=teclado.next().charAt(0);
                             if(tipoBus=='N')tipoBus='n';
                             if(tipoBus=='E')tipoBus='e';
                         }while(tipoBus!='n' && tipoBus!='e');
-                        if(tipoBus=='n') System.out.println("Búsqueda por Nombre: ");{
-                            busqueda=teclado.nextLine();
+                        System.out.println("TEST - Tipo de búsqueda: "+tipoBus);
+                        if(tipoBus=='n'){
+                            System.out.println("Búsqueda por Nombre: ");
+                            System.out.print(">");
+                            busqueda=teclado.next();
+                            muestraRecetas(con, busqueda, tipoBus);
+                        }/*
+                        if(tipoBus=='e'){
+                            //teclado.nextLine();
+                            char opcEti=' ';
+                            System.out.println("Búsqueda por Etiqueta: ");
+                            do{
+                                System.out.print(">");
+                                busqueda=teclado.next(); 
+                                System.out.println("Desea añadir otra etiqueta? s/n: ");
+                                do{
+                                    System.out.print(">");
+                                    opcEti = teclado.next().charAt(0);
+                                    if(opcEti=='S')tipoBus='s';
+                                    if(opcEti=='N')tipoBus='n';
+                                }while(opcEti != 's' && opcEti != 'n');
+                                System.out.println("opcEti= "+opcEti);
+                                etiquetas[contEti] = busqueda;
+                                contEti++;
+                                if(contEti==(etiquetas.length-1)) break;
+                            }while(opcEti!='n');//fallo aquí
+                            busquedaEti(con, etiquetas, busqueda);   
+                        }*/
+                        
+                        if(tipoBus=='e'){
+                            char opcEti=' ';
+                            boolean salirBusquedaEtiqueta=false;
+                            System.out.println("Búsqueda por Etiqueta.");
+                            do{
+                                System.out.println("Añade una etiqueda a la búsqueda:");
+                                System.out.print(">");
+                                busqueda=teclado.next();
+                                System.out.println("Desea añadir otra etiqueta? (s/n): ");
+                                do{
+                                    System.out.print(">");
+                                    opcEti=teclado.next().charAt(0);
+                                    if(opcEti=='S')opcEti='s';
+                                    if(opcEti=='N')opcEti='n';
+                                }while(opcEti!='s' && opcEti!='n');
+                                etiquetas[contEti] = busqueda;
+                                contEti++;
+                                if(opcEti=='n') salirBusquedaEtiqueta=true;
+                                
+                            }while(!salirBusquedaEtiqueta || contEti<etiquetas.length);
+                            System.out.println("Cantidad array etiquetas: "+contEti);
+                            busquedaEti(con, etiquetas, busqueda);      
+                            
+                            
                         }
-                        if(tipoBus=='e') System.out.println("Búsqueda por Etiqueta: ");{
-                            busqueda=teclado.next();                        
-                        }
-                        muestraRecetas(con, busqueda, tipoBus);                        
                         break;
 
                     case ELIMINA_RECETA:
@@ -262,8 +314,7 @@ public class Cocina_Canibal {
                             System.out.println("De entre los resultados, indica el índice de la receta que quieres puntuar:");
                             System.out.print(">");
                             recetaElegida=compInput();
-                            asignaEstrellas(con, recetaElegida);//en obras
-                            
+                            asignaEstrellas(con, login, recetaElegida);//en obras
                         }
                         else {
                             System.out.println("Login necesario.");

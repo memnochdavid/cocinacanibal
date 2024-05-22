@@ -106,6 +106,7 @@ public class Libreria {
     //muestra las recetas - recibe un String búsqueda y un char opc que especifica el modo de búsqueda, si por tags o por nombre 
     public static void muestraRecetas(Conexion con, String busqueda, char opc) throws SQLException{
         String creador="", nombre="", desc="", ingre="", pasos="", cod="", tags="";
+        int estrellas =0;
         int existe=0, seleccion=-1;
         if(opc=='n'){//busca por nombre
             existe=Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
@@ -116,11 +117,19 @@ public class Libreria {
             }
             else{
                 while(cont<=existe){
+                    //Character.getNumericValue(con.selectToString("select estrellas from recetas where cod = "+cont).charAt(0));
                     nombre=con.selectToString("select nombre from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     cod=con.selectToString("select cod from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
+                    estrellas = Character.getNumericValue(con.selectToString("select estrellas from recetas where cod = "+cont).charAt(0));
                     if(!cod.equals("")){
                         System.out.println("\n=======================================");
-                        System.out.println("Código: "+cod+"\nNombre: "+nombre);
+                        System.out.print("Código: "+cod+"\nNombre: "+nombre+"\nPuntuacion: ");
+                        if(estrellas == 0) System.out.println("");
+                        if(estrellas == 1) System.out.println("\u001B[33m★\u001B[30m");
+                        if(estrellas == 2) System.out.println("\u001B[33m★★\u001B[30m");
+                        if(estrellas == 3) System.out.println("\u001B[33m★★★\u001B[30m");
+                        if(estrellas == 4) System.out.println("\u001B[33m★★★★\u001B[30m");
+                        if(estrellas == 5) System.out.println("\u001B[33m★★★★★\u001B[30m");
                     }
                     cont++;
                 }
@@ -147,9 +156,10 @@ public class Libreria {
             else{
                 while(cont<=existe){                    
                     nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");                    
-                    cod=con.selectToString("select cod from recetas where cod in (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'))").replaceAll(" - \n", "");
+                    cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'))").replaceAll(" - \n", "");
                     if(!nombre.equals("")) System.out.println("Código: "+cod+"\nNombre: "+nombre);;
                     cont++;
+                    System.out.println("==============================");
                 }
                 System.out.println("Selecciona la receta que deseas ver:");
                 seleccion=compInput();
@@ -158,7 +168,79 @@ public class Libreria {
         }
     }
     
-    
+    public static void busquedaEti(Conexion con, String[] nom_etiquetas, String busqueda) throws SQLException{//busca por etiqueta
+            String creador="", nombre="", desc="", ingre="", pasos="", cod="", tags="";
+            int existe=0, seleccion=-1;
+            Etiquetas[] etiqueta=Etiquetas.values();
+            existe=Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
+            int cont=1;
+            boolean etiquetaFound=false;
+            int[] cod_etis = new int[nom_etiquetas.length];
+            //System.out.println("hola");
+            //System.out.println("cod_etis.length: "+cod_etis.length);
+            int cont_cod = 0;
+            /*for(int i=1; i<etiqueta.length; i++){//fallo aquí
+                for(int j=0; j<nom_etiquetas.length; i++){*/
+            for(int i=1; i<etiqueta.length; i++){// i empieza en 1 para evitar la posición cero, que contiene una entrada dummy. Así se evita que la primera opción aparezca en rojo
+                //noMostrar = false; //Reinicio variable
+                for(int j=0; j<nom_etiquetas.length; j++){
+                    //System.out.println(etiqueta[i].toString()+" = "+etiquetas[j]);
+                    if(etiqueta[i].toString().contains(nom_etiquetas[j])){
+                        cod_etis[cont_cod] = i;
+                        etiquetaFound = true;
+                        if(!etiquetaFound){
+                            System.out.println("No existe la Etiqueta '"+nom_etiquetas[j]+"'.");
+                        }
+                        if(etiquetaFound) cod_etis[cont_cod] = i;
+                        cont_cod++;
+                        break;
+                    }
+                }
+                
+            }
+            //System.out.println("cod_etis.length: "+cod_etis.length);
+            if(cod_etis.length > 0){
+                if(cod_etis.length==1){
+                    while(cont<=existe){                    
+                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod="+cont+")").replaceAll(" - \n", "");                    
+                        cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
+                        if(!nombre.equals("")){
+                            System.out.println("Código: "+cod+"\nNombre: "+nombre);
+                        }
+                            cont++;
+                            System.out.println("==============================");
+                        }
+                }
+                if(cod_etis.length==2){
+                    while(cont<=existe){                    
+                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[1]+" and cod"+cont+"))").replaceAll(" - \n", "");                    
+                        cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
+                        if(!nombre.equals("")){
+                            System.out.println("Código: "+cod+"\nNombre: "+nombre);
+                        }
+                            cont++;
+                            System.out.println("==============================");
+                        }
+                }
+                if(cod_etis.length==3){
+                    while(cont<=existe){                    
+                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[1]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[2]+" and cod = "+cont+")))").replaceAll(" - \n", "");                    
+                        cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
+                        if(!nombre.equals("")){
+                            System.out.println("Código: "+cod+"\nNombre: "+nombre);
+                        }
+                            cont++;
+                            System.out.println("==============================");
+                    }
+                }
+                //System.out.println("cod_etis.length: "+cod_etis.length);
+                //System.out.println("hola");
+                System.out.println("Selecciona la receta que deseas ver:");
+                seleccion=compInput();
+                
+                //desglosaReceta(con, seleccion,  busqueda,  EtiquetaFound,'e');
+            }
+        }
     
     
     
@@ -462,24 +544,30 @@ public class Libreria {
     }
     
     //pregunta al usuario cuántas estrellas asignar a una receta - recibe el int 'cod' de la receta a puntuar - después inserta la puntuación en la BD a la receta indicada
-    public static void asignaEstrellas(Conexion con, int cod_receta) throws SQLException{
+    public static void asignaEstrellas(Conexion con, Usuario login, int cod_receta) throws SQLException{
+        //Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
         Scanner teclado=new Scanner(System.in);
-        int stars=-1;
-        String insert_estrellas="";
-        System.out.println("Puntúa esta receta con estrellas (1-5):");
+        String usr=login.getUsr();
+        
+        String fecha="(trunc(sysdate))";//se pasa sin comillas
+        String opinion="";
+        int valoracion=0, n_votos=0, stars=-1;        
+        teclado.nextLine();
+        System.out.println("¿Qué opinas de esta receta?");
+        System.out.print(">");
+        opinion=teclado.nextLine();
         do{
+            System.out.println("¿Qué valoración le das?(1-5):");
             System.out.print(">");
-            stars=teclado.nextInt();
-        }while(stars<1 || stars>5);
-        String consulta = "select estrellas from recetas where cod='"+cod_receta+"'";
-        ResultSet rs = con.select2(consulta);
-        while(rs.next()){
-            stars += rs.getInt(1);
-        }
-        
-        insert_estrellas="update recetas set estrellas="+stars+" where cod="+cod_receta;
-        
+            valoracion=teclado.nextInt();
+        }while(valoracion<1 || valoracion>5);
+        String insert_estrellas="insert into estrellas (usuario, receta, fecha, opinion, valoracion) values ('"+usr+"',"+cod_receta+", "+fecha+", '"+opinion+"',"+valoracion+")";
         con.insert(insert_estrellas);
+        n_votos=Character.getNumericValue(con.selectToString("select count(*) from estrellas where receta="+cod_receta).charAt(0));
+        stars=Character.getNumericValue(con.selectToString("select sum(valoracion) from estrellas where receta="+cod_receta).charAt(0));
+        stars/=n_votos;
+        String update_recetas="update recetas set estrellas="+stars+" where cod="+cod_receta;
+        con.insert(update_recetas);
     }
     
     
@@ -584,9 +672,11 @@ public class Libreria {
         String tablaRece = "create table recetas(cod integer generated always as identity (start with 1 increment by 1), owner 	varchar2(25), nombre  varchar2(25), descripcion    varchar2(100) not null, ingredientes varchar2(550), pasos   varchar2(500), estrellas number(1,0) check (estrellas between 1 and 5), constraint pk_recetas primary key (cod), constraint fk_rec_usu foreign key (owner) references usuarios(usr))";
         String tablaEtiq ="create table etiqueta (id integer generated always as identity (start with 1 increment by 1) primary key, nom varchar2(30))";
         String tablaRec_Et="create table rec_et (cod	    number(3), id      integer, constraint pk_rec_et primary key(cod, id),constraint fk_rec_re foreign key (cod) references recetas(cod))";
+        String tablaStars="create table estrellas (usuario varchar(25),receta number(3),fecha date, opinion varchar2(500),valoracion number(1)check(valoracion between 1 and 5),constraint pk_estrellas primary key (usuario, receta, fecha), constraint fk_estre_usu foreign key (usuario) references usuarios(usr), constraint fk_estre_rec foreign key (receta) references recetas(cod))";
         String admin = "insert into usuarios values ('admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'admin@admin.com', 2)";
         String base = "insert into usuarios values ('base', 'base', 'base', 0)";
         String testUsr="insert into usuarios values ('test', '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', 'test@test.com', 1)";//borrar cuando esté la práctica
+        
         //las etiquetas
         String etiq="";
         String err="ninguno";
@@ -605,6 +695,8 @@ public class Libreria {
             err="Etiq insert";
             con.insert(tablaRec_Et);
             err="tablaRec_Et";
+            con.insert(tablaStars);
+            err="tablaStars";
             con.insert(admin);
             err="admin";
             con.insert(base);
@@ -623,6 +715,7 @@ public class Libreria {
         String dropEtiq="drop table etiqueta cascade constraints";
         String dropReces="drop table recetas cascade constraints";
         String dropUsrs="drop table usuarios cascade constraints";
+        String dropStars="drop table estrellas cascade constraints";
         try{
             con.insert(dropRec_Et);
             err="dropRec_Et";
@@ -632,6 +725,8 @@ public class Libreria {
             err="dropReces";
             con.insert(dropUsrs);
             err="dropUsrs";
+            con.insert(dropStars);
+            err="dropStars";
         }catch(Exception e){
             System.out.println("Error: "+err);
         }finally{
