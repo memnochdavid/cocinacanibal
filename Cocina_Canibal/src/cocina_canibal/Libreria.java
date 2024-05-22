@@ -135,7 +135,7 @@ public class Libreria {
                 }
                 System.out.println("Selecciona la receta que deseas ver:");
                 seleccion=compInput();
-                desglosaReceta(con, seleccion,  busqueda,  0,'n');
+                desglosaReceta(con, seleccion,  busqueda,  0,'n', nombre);
                 
             }
         }
@@ -154,6 +154,7 @@ public class Libreria {
                 System.out.println("No existe la Etiqueta '"+busqueda+"'.");
             }
             else{
+                System.out.println("==============================");
                 while(cont<=existe){                    
                     nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+cont+")").replaceAll(" - \n", "");                    
                     cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'))").replaceAll(" - \n", "");
@@ -163,7 +164,7 @@ public class Libreria {
                 }
                 System.out.println("Selecciona la receta que deseas ver:");
                 seleccion=compInput();
-                desglosaReceta(con, seleccion,  busqueda,  EtiquetaFound,'e');
+                desglosaReceta(con, seleccion,  busqueda,  EtiquetaFound,'e', nombre);
             }
         }
     }
@@ -201,6 +202,7 @@ public class Libreria {
             //System.out.println("cod_etis.length: "+cod_etis.length);
             if(conEti > 0){
                 if(conEti==1){
+                    System.out.println("==============================");
                     while(cont<=existe){                    
                         nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod="+cont+")").replaceAll(" - \n", "");                    
                         cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
@@ -212,6 +214,7 @@ public class Libreria {
                         }
                 }
                 if(conEti==2){
+                    System.out.println("==============================");
                     while(cont<=existe){                    
                         nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[1]+" and cod"+cont+"))").replaceAll(" - \n", "");                    
                         cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
@@ -223,6 +226,7 @@ public class Libreria {
                         }
                 }
                 if(conEti==3){
+                    System.out.println("==============================");
                     while(cont<=existe){                    
                         nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[1]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[2]+" and cod = "+cont+")))").replaceAll(" - \n", "");                    
                         cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
@@ -238,7 +242,7 @@ public class Libreria {
                 System.out.println("Selecciona la receta que deseas ver:");
                 seleccion=compInput();
                 int codRec = Integer.parseInt(cod);
-                desglosaReceta(con, seleccion,  busqueda,  codRec,'e');
+                desglosaReceta(con, seleccion,  busqueda,  codRec,'e', nombre);
             }
         }
     
@@ -248,7 +252,7 @@ public class Libreria {
     
     
     //desglosa la búsqueda de una receta seleccionada - //este método se va a llamar cuando ya se ha comprobado que la receta en cuestión existe
-    public static void desglosaReceta(Conexion con, int indice, String busqueda, int EtiquetaFound,char opc) throws SQLException{
+    public static void desglosaReceta(Conexion con, int indice, String busqueda, int EtiquetaFound,char opc, String nombre) throws SQLException{
         String creador="", desc="", ingre="", pasos="", tags="";
         int existe=-1;
         if(opc=='n'){
@@ -265,7 +269,15 @@ public class Libreria {
             desc=con.selectToString("select descripcion from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "");
             ingre=con.selectToString("select ingredientes from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "");
             pasos=con.selectToString("select pasos from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "").replaceAll(" - ", "\n");
-            System.out.println("\nTags: "+tags+"\nCreador: "+creador+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);            
+            nombre = nombre.toUpperCase();
+            System.out.println("\n======= "+nombre+" =======");   
+            System.out.println("Tags: "+tags);
+            System.out.println("Creador: "+creador);
+            System.out.println("Descripcion: "+desc);
+            System.out.println("Ingredientes: "+ingre);
+            System.out.println("===================");
+            System.out.println("Pasos: \n"+pasos);
+            System.out.println("===================");   
         }
     }
     
