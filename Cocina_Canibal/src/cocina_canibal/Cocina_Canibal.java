@@ -169,14 +169,14 @@ public class Cocina_Canibal {
                         char tipoBus=' ';
                         teclado.nextLine();
                         System.out.println("======================");
-                        System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
+                        System.out.println("¿Buscar Receta por Nombre / Etiqueta / Usuario?(n/e/u)");
                         //System.out.println("hola");
                         do{
                             System.out.print(">");
-                            tipoBus=teclado.next().charAt(0);
+                            tipoBus=teclado.next().toLowerCase().charAt(0);
                             if(tipoBus=='N')tipoBus='n';
                             if(tipoBus=='E')tipoBus='e';
-                        }while(tipoBus!='n' && tipoBus!='e');
+                        }while(tipoBus!='n' && tipoBus!='e' && tipoBus!='u');
                         System.out.println("TEST - Tipo de búsqueda: "+tipoBus);
                         if(tipoBus=='n'){
                             System.out.println("Búsqueda por Nombre: ");
@@ -235,6 +235,12 @@ public class Cocina_Canibal {
                             busquedaEti(con, etiquetas, busqueda, contEti);      
                             
                             
+                        }
+                        if(tipoBus=='u'){
+                            System.out.println("Búsqueda por Usuario: ");
+                            System.out.print(">");
+                            busqueda=teclado.next();
+                            muestraRecetasNombre(con, busqueda, tipoBus);
                         }
                         break;
 

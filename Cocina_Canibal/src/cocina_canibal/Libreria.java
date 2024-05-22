@@ -168,7 +168,43 @@ public class Libreria {
             }
         }
     }
-    
+    public static void muestraRecetasNombre(Conexion con, String busqueda, char opc) throws SQLException{
+        String creador="", nombre="", desc="", ingre="", pasos="", cod="", tags="";
+        int estrellas =0;
+        int existe=0, seleccion=-1;
+        existe=Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
+        int cont=1;
+        if(existe==0){
+            System.out.println("No se han encontrado coincidencias.");
+            System.out.println("Búsqueda: "+busqueda);
+        }
+        else{
+            while(cont<=existe){
+                //Character.getNumericValue(con.selectToString("select estrellas from recetas where cod = "+cont).charAt(0));
+                nombre=con.selectToString("select nombre from recetas where owner like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
+                cod=con.selectToString("select cod from recetas where owner like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
+                estrellas = Character.getNumericValue(con.selectToString("select estrellas from recetas where cod = "+cont).charAt(0));
+                if(!cod.equals("")){
+                    System.out.println("\n=======================================");
+                    System.out.print("Código: "+cod+"\nNombre: "+nombre+"\nPuntuacion: ");
+                    if(estrellas == 0) System.out.println("");
+                    if(estrellas == 1) System.out.println("\u001B[33m★\u001B[30m");
+                    if(estrellas == 2) System.out.println("\u001B[33m★★\u001B[30m");
+                    if(estrellas == 3) System.out.println("\u001B[33m★★★\u001B[30m");
+                    if(estrellas == 4) System.out.println("\u001B[33m★★★★\u001B[30m");
+                    if(estrellas == 5) System.out.println("\u001B[33m★★★★★\u001B[30m");
+                }
+                cont++;
+            }
+            System.out.println("Selecciona la receta que deseas ver:");
+            seleccion=compInput();
+            
+            cod=con.selectToString("select cod from recetas where owner like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
+            int codRec = Integer.parseInt(cod);
+            
+            desglosaReceta(con, seleccion,  busqueda,  codRec,'n', nombre);
+        }
+    }
     public static void busquedaEti(Conexion con, String[] nom_etiquetas, String busqueda, int conEti) throws SQLException{//busca por etiqueta
             String creador="", nombre="", desc="", ingre="", pasos="", cod="", tags="";
             int existe=0, seleccion=-1;
@@ -255,13 +291,35 @@ public class Libreria {
     public static void desglosaReceta(Conexion con, int indice, String busqueda, int EtiquetaFound,char opc, String nombre) throws SQLException{
         String creador="", desc="", ingre="", pasos="", tags="";
         int existe=-1;
+        if(opc=='u'){
+            tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
+            creador=con.selectToString("select owner from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            desc=con.selectToString("select descripcion from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            ingre=con.selectToString("select ingredientes from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            pasos=con.selectToString("select pasos from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            System.out.println("\n======= "+nombre+" =======");   
+            System.out.println("Tags: "+tags);
+            System.out.println("Creador: "+creador);
+            System.out.println("Descripcion: "+desc);
+            System.out.println("Ingredientes: "+ingre);
+            System.out.println("===================");
+            System.out.println("Pasos: \n"+pasos);
+            System.out.println("===================");
+        }
         if(opc=='n'){
             tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
             creador=con.selectToString("select owner from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
             desc=con.selectToString("select descripcion from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
             ingre=con.selectToString("select ingredientes from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
             pasos=con.selectToString("select pasos from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
-            System.out.println("\nTags: "+tags+"\nCreador: "+creador+"\nDescripción:\n"+desc+"\nIngredientes: "+ingre+"\nPasos:\n"+pasos);
+            System.out.println("\n======= "+nombre+" =======");   
+            System.out.println("Tags: "+tags);
+            System.out.println("Creador: "+creador);
+            System.out.println("Descripcion: "+desc);
+            System.out.println("Ingredientes: "+ingre);
+            System.out.println("===================");
+            System.out.println("Pasos: \n"+pasos);
+            System.out.println("==================="); 
         }
         if(opc=='e'){
             tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
