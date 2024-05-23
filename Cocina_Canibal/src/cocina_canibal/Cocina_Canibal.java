@@ -159,6 +159,9 @@ public class Cocina_Canibal {
                         break;
 
                     case BUSCA_RECETA:   
+                        
+                        /*--------- DE AQUI PARA ABAJO ---------*/
+                        
                         String busqueda;
                         String[] etiquetas = new String[3];
                         etiquetas[0]="";
@@ -182,30 +185,8 @@ public class Cocina_Canibal {
                             System.out.println("Búsqueda por Nombre: ");
                             System.out.print(">");
                             busqueda=teclado.next().toLowerCase();
-                            muestraRecetas(con, busqueda, tipoBus);
-                        }/*
-                        if(tipoBus=='e'){
-                            //teclado.nextLine();
-                            char opcEti=' ';
-                            System.out.println("Búsqueda por Etiqueta: ");
-                            do{
-                                System.out.print(">");
-                                busqueda=teclado.next(); 
-                                System.out.println("Desea añadir otra etiqueta? s/n: ");
-                                do{
-                                    System.out.print(">");
-                                    opcEti = teclado.next().charAt(0);
-                                    if(opcEti=='S')tipoBus='s';
-                                    if(opcEti=='N')tipoBus='n';
-                                }while(opcEti != 's' && opcEti != 'n');
-                                System.out.println("opcEti= "+opcEti);
-                                etiquetas[contEti] = busqueda;
-                                contEti++;
-                                if(contEti==(etiquetas.length-1)) break;
-                            }while(opcEti!='n');//fallo aquí
-                            busquedaEti(con, etiquetas, busqueda);   
-                        }*/
-                        
+                            muestraRecetasReceta(con, busqueda);
+                        }
                         if(tipoBus=='e'){
                             char opcEti=' ';
                             boolean salirBusquedaEtiqueta=false;
@@ -242,6 +223,9 @@ public class Cocina_Canibal {
                             busqueda=teclado.next();
                             muestraRecetasNombre(con, busqueda, tipoBus);
                         }
+                        
+                        /*--------- DE AQUI PARA ARRIBA ---------*/
+                        
                         break;
 
                     case ELIMINA_RECETA:
@@ -250,20 +234,70 @@ public class Cocina_Canibal {
                             if(login.getLvl()>0){//sólo el login con lvl 1 o 2
                                 int recetaElegida=-1;
                                 System.out.println("Eliminar Receta.");
-                                System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
+                                
+                                /*--------- DE AQUI PARA ABAJO ---------*/
+                                
+                                etiquetas = new String[3];
+                                etiquetas[0]="";
+                                etiquetas[1]="";
+                                etiquetas[2]="";
+                                contEti = 0;
+                                teclado.nextLine();
+                                System.out.println("======================");
+                                System.out.println("¿Buscar Receta por Nombre / Etiqueta / Usuario?(n/e/u)");
+                                //System.out.println("hola");
                                 do{
                                     System.out.print(">");
-                                    tipoBus=teclado.next().charAt(0);
+                                    tipoBus=teclado.next().toLowerCase().charAt(0);
                                     if(tipoBus=='N')tipoBus='n';
                                     if(tipoBus=='E')tipoBus='e';
-                                }while(tipoBus!='n' && tipoBus!='e');
-                                if(tipoBus=='n') System.out.println("Búsqueda por Nombre: ");{
-                                    busqueda=teclado.nextLine();
+                                }while(tipoBus!='n' && tipoBus!='e' && tipoBus!='u');
+                                System.out.println("TEST - Tipo de búsqueda: "+tipoBus);
+                                if(tipoBus=='n'){
+                                    System.out.println("Búsqueda por Nombre: ");
+                                    System.out.print(">");
+                                    busqueda=teclado.next().toLowerCase();
+                                    muestraRecetasReceta(con, busqueda);
                                 }
-                                if(tipoBus=='e') System.out.println("Búsqueda por Etiqueta: ");{
-                                    busqueda=teclado.next();                        
+                                if(tipoBus=='e'){
+                                    char opcEti=' ';
+                                    boolean salirBusquedaEtiqueta=false;
+                                    System.out.println("Búsqueda por Etiqueta.");
+                                    do{
+                                        System.out.println("Añade una etiqueda a la búsqueda:");
+                                        System.out.print(">");
+                                        busqueda=teclado.next();
+                                        System.out.println("Desea añadir otra etiqueta? (s/n): ");
+                                        do{
+                                            System.out.print(">");
+                                            opcEti=teclado.next().charAt(0);
+                                            if(opcEti=='S')opcEti='s';
+                                            if(opcEti=='N')opcEti='n';
+                                        }while(opcEti!='s' && opcEti!='n');
+                                        etiquetas[contEti] = busqueda;
+                                        contEti++;
+                                        if(opcEti=='n') salirBusquedaEtiqueta=true;
+
+                                    }while(!salirBusquedaEtiqueta && contEti<etiquetas.length);
+                                    if(contEti == 1){
+                                        etiquetas[1] = etiquetas[0];
+                                        etiquetas[2] = etiquetas[0];
+                                    }
+                                    if(contEti == 2) etiquetas[2] = etiquetas[0];
+                                    System.out.println("Cantidad array etiquetas: "+contEti);
+                                    busquedaEti(con, etiquetas, busqueda, contEti);      
+
+
                                 }
-                                muestraRecetas(con, busqueda, tipoBus);
+                                if(tipoBus=='u'){
+                                    System.out.println("Búsqueda por Usuario: ");
+                                    System.out.print(">");
+                                    busqueda=teclado.next();
+                                    muestraRecetasNombre(con, busqueda, tipoBus);
+                                }
+                                
+                                /*--------- DE AQUI PARA ARRIBA ---------*/
+                                
                                 System.out.println("De entre los resultados, indica el índice de la receta que quieres borrar:");
                                 recetaElegida=compInput();
                                 borraModReceta(con, login, recetaElegida, 'b');//opción 'b' para borrar
@@ -280,20 +314,70 @@ public class Cocina_Canibal {
                         if(logged){//requiere login
                             System.out.println("Modificar Recetas.");
                             int recetaElegida=-1;
-                            System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
+                            
+                            /*--------- DE AQUI PARA ABAJO ---------*/
+                            
+                            etiquetas = new String[3];
+                            etiquetas[0]="";
+                            etiquetas[1]="";
+                            etiquetas[2]="";
+                            contEti = 0;
+                            teclado.nextLine();
+                            System.out.println("======================");
+                            System.out.println("¿Buscar Receta por Nombre / Etiqueta / Usuario?(n/e/u)");
+                            //System.out.println("hola");
                             do{
                                 System.out.print(">");
-                                tipoBus=teclado.next().charAt(0);
+                                tipoBus=teclado.next().toLowerCase().charAt(0);
                                 if(tipoBus=='N')tipoBus='n';
                                 if(tipoBus=='E')tipoBus='e';
-                            }while(tipoBus!='n' && tipoBus!='e');
-                            if(tipoBus=='n') System.out.println("Búsqueda por Nombre: ");{
-                                busqueda=teclado.nextLine();
+                            }while(tipoBus!='n' && tipoBus!='e' && tipoBus!='u');
+                            System.out.println("TEST - Tipo de búsqueda: "+tipoBus);
+                            if(tipoBus=='n'){
+                                System.out.println("Búsqueda por Nombre: ");
+                                System.out.print(">");
+                                busqueda=teclado.next().toLowerCase();
+                                muestraRecetasReceta(con, busqueda);
                             }
-                            if(tipoBus=='e') System.out.println("Búsqueda por Etiqueta: ");{
-                                busqueda=teclado.next();                        
+                            if(tipoBus=='e'){
+                                char opcEti=' ';
+                                boolean salirBusquedaEtiqueta=false;
+                                System.out.println("Búsqueda por Etiqueta.");
+                                do{
+                                    System.out.println("Añade una etiqueda a la búsqueda:");
+                                    System.out.print(">");
+                                    busqueda=teclado.next();
+                                    System.out.println("Desea añadir otra etiqueta? (s/n): ");
+                                    do{
+                                        System.out.print(">");
+                                        opcEti=teclado.next().charAt(0);
+                                        if(opcEti=='S')opcEti='s';
+                                        if(opcEti=='N')opcEti='n';
+                                    }while(opcEti!='s' && opcEti!='n');
+                                    etiquetas[contEti] = busqueda;
+                                    contEti++;
+                                    if(opcEti=='n') salirBusquedaEtiqueta=true;
+
+                                }while(!salirBusquedaEtiqueta && contEti<etiquetas.length);
+                                if(contEti == 1){
+                                    etiquetas[1] = etiquetas[0];
+                                    etiquetas[2] = etiquetas[0];
+                                }
+                                if(contEti == 2) etiquetas[2] = etiquetas[0];
+                                System.out.println("Cantidad array etiquetas: "+contEti);
+                                busquedaEti(con, etiquetas, busqueda, contEti);      
+
+
                             }
-                            muestraRecetas(con, busqueda, tipoBus);
+                            if(tipoBus=='u'){
+                                System.out.println("Búsqueda por Usuario: ");
+                                System.out.print(">");
+                                busqueda=teclado.next();
+                                muestraRecetasNombre(con, busqueda, tipoBus);
+                            }
+                            
+                            /*--------- DE AQUI PARA ARRIBA ---------*/
+                            
                             System.out.println("De entre los resultados, indica el índice de la receta que quieres editar:");
                             System.out.print(">");
                             recetaElegida=compInput();
@@ -308,20 +392,70 @@ public class Cocina_Canibal {
                         if(logged){//requiere login
                             System.out.println("Puntuar Recetas.");
                             int recetaElegida=-1;
-                            System.out.println("¿Buscar Receta por Nombre o por Etiqueta?(n/e)");
+                            
+                            /*--------- DE AQUI PARA ABAJO ---------*/
+                            
+                            etiquetas = new String[3];
+                            etiquetas[0]="";
+                            etiquetas[1]="";
+                            etiquetas[2]="";
+                            contEti = 0;
+                            teclado.nextLine();
+                            System.out.println("======================");
+                            System.out.println("¿Buscar Receta por Nombre / Etiqueta / Usuario?(n/e/u)");
+                            //System.out.println("hola");
                             do{
                                 System.out.print(">");
-                                tipoBus=teclado.next().charAt(0);
+                                tipoBus=teclado.next().toLowerCase().charAt(0);
                                 if(tipoBus=='N')tipoBus='n';
                                 if(tipoBus=='E')tipoBus='e';
-                            }while(tipoBus!='n' && tipoBus!='e');
-                            if(tipoBus=='n') System.out.println("Búsqueda por Nombre: ");{
-                                busqueda=teclado.nextLine();
+                            }while(tipoBus!='n' && tipoBus!='e' && tipoBus!='u');
+                            System.out.println("TEST - Tipo de búsqueda: "+tipoBus);
+                            if(tipoBus=='n'){
+                                System.out.println("Búsqueda por Nombre: ");
+                                System.out.print(">");
+                                busqueda=teclado.next().toLowerCase();
+                                muestraRecetasReceta(con, busqueda);
                             }
-                            if(tipoBus=='e') System.out.println("Búsqueda por Etiqueta: ");{
-                                busqueda=teclado.next();                        
+                            if(tipoBus=='e'){
+                                char opcEti=' ';
+                                boolean salirBusquedaEtiqueta=false;
+                                System.out.println("Búsqueda por Etiqueta.");
+                                do{
+                                    System.out.println("Añade una etiqueda a la búsqueda:");
+                                    System.out.print(">");
+                                    busqueda=teclado.next();
+                                    System.out.println("Desea añadir otra etiqueta? (s/n): ");
+                                    do{
+                                        System.out.print(">");
+                                        opcEti=teclado.next().charAt(0);
+                                        if(opcEti=='S')opcEti='s';
+                                        if(opcEti=='N')opcEti='n';
+                                    }while(opcEti!='s' && opcEti!='n');
+                                    etiquetas[contEti] = busqueda;
+                                    contEti++;
+                                    if(opcEti=='n') salirBusquedaEtiqueta=true;
+
+                                }while(!salirBusquedaEtiqueta && contEti<etiquetas.length);
+                                if(contEti == 1){
+                                    etiquetas[1] = etiquetas[0];
+                                    etiquetas[2] = etiquetas[0];
+                                }
+                                if(contEti == 2) etiquetas[2] = etiquetas[0];
+                                System.out.println("Cantidad array etiquetas: "+contEti);
+                                busquedaEti(con, etiquetas, busqueda, contEti);      
+
+
                             }
-                            muestraRecetas(con, busqueda, tipoBus);
+                            if(tipoBus=='u'){
+                                System.out.println("Búsqueda por Usuario: ");
+                                System.out.print(">");
+                                busqueda=teclado.next();
+                                muestraRecetasNombre(con, busqueda, tipoBus);
+                            }
+                            
+                            /*--------- DE AQUI PARA ARRIBA ---------*/
+                            
                             System.out.println("De entre los resultados, indica el índice de la receta que quieres puntuar:");
                             System.out.print(">");
                             recetaElegida=compInput();
