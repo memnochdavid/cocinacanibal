@@ -185,21 +185,14 @@ public class Libreria {
             int cont=1;
             boolean etiquetaFound=false;
             int[] cod_etis = new int[nom_etiquetas.length];
-            //System.out.println("hola");
-            //System.out.println("cod_etis.length: "+cod_etis.length);
             int cont_cod = 0;
-            /*for(int i=1; i<etiqueta.length; i++){//fallo aquí
-                for(int j=0; j<nom_etiquetas.length; i++){*/
             for(int i=1; i<etiqueta.length; i++){// i empieza en 1 para evitar la posición cero, que contiene una entrada dummy. Así se evita que la primera opción aparezca en rojo
                 //noMostrar = false; //Reinicio variable
+                etiquetaFound = false;
                 for(int j=0; j<conEti; j++){
                     //System.out.println(etiqueta[i].toString()+" = "+etiquetas[j]);
                     if(etiqueta[i].toString().contains(nom_etiquetas[j])){
                         cod_etis[cont_cod] = i;
-                        etiquetaFound = true;
-                        if(!etiquetaFound){
-                            System.out.println("No existe la Etiqueta '"+nom_etiquetas[j]+"'.");
-                        }
                         if(etiquetaFound) cod_etis[cont_cod] = i;
                         cont_cod++;
                         break;
@@ -207,9 +200,8 @@ public class Libreria {
                 }
                 
             }
-            //System.out.println("cod_etis.length: "+cod_etis.length);
-            if(conEti > 0){
-                if(conEti==1){
+            if(cont_cod > 0){
+                if(cont_cod==1){
                     System.out.println("==============================");
                     while(cont<=existe){                    
                         nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod="+cont+")").replaceAll(" - \n", "");                    
@@ -221,7 +213,7 @@ public class Libreria {
                             System.out.println("==============================");
                         }
                 }
-                if(conEti==2){
+                if(cont_cod==2){
                     System.out.println("==============================");
                     while(cont<=existe){                    
                         nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[1]+" and cod="+cont+"))").replaceAll(" - \n", "");                    
@@ -233,7 +225,7 @@ public class Libreria {
                             System.out.println("==============================");
                         }
                 }
-                if(conEti==3){
+                if(cont_cod==3){
                     System.out.println("==============================");
                     while(cont<=existe){                    
                         nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[1]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[2]+" and cod = "+cont+")))").replaceAll(" - \n", "");                    
