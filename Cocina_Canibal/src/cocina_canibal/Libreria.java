@@ -118,8 +118,8 @@ public class Libreria {
             else{
                 while(cont<=existe){
                     //Character.getNumericValue(con.selectToString("select estrellas from recetas where cod = "+cont).charAt(0));
-                    nombre=con.selectToString("select nombre from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
-                    cod=con.selectToString("select cod from recetas where nombre like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
+                    nombre=con.selectToString("select nombre from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
+                    cod=con.selectToString("select cod from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     estrellas = Character.getNumericValue(con.selectToString("select estrellas from recetas where cod = "+cont).charAt(0));
                     if(!cod.equals("")){
                         System.out.println("\n=======================================");
@@ -293,10 +293,10 @@ public class Libreria {
         int existe=-1;
         if(opc=='u'){
             tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
-            creador=con.selectToString("select owner from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
-            desc=con.selectToString("select descripcion from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
-            ingre=con.selectToString("select ingredientes from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
-            pasos=con.selectToString("select pasos from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            creador=con.selectToString("select owner from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            desc=con.selectToString("select descripcion from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            ingre=con.selectToString("select ingredientes from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            pasos=con.selectToString("select pasos from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
             System.out.println("\n======= "+nombre+" =======");   
             System.out.println("Tags: "+tags);
             System.out.println("Creador: "+creador);

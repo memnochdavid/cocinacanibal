@@ -181,7 +181,7 @@ public class Cocina_Canibal {
                         if(tipoBus=='n'){
                             System.out.println("Búsqueda por Nombre: ");
                             System.out.print(">");
-                            busqueda=teclado.next();
+                            busqueda=teclado.next().toLowerCase();
                             muestraRecetas(con, busqueda, tipoBus);
                         }/*
                         if(tipoBus=='e'){
