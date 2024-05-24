@@ -202,17 +202,22 @@ public class Cocina_Canibal {
                         break;
                     case MODIFICAR://en obras                        
                         if(logged){//requiere login
-                            System.out.println("Modificar Recetas.");
-                            int recetaElegida=-1;
-                            
-                            /*--------- BUSCA RECETA ---------*/                              
-                            busca(etiquetas, indice, contEti, tipoBus, busqueda, con);
-                            
-                            System.out.println("De entre los resultados, indica el índice de la receta que quieres editar:");
-                            System.out.print(">");
-                            recetaElegida=compInput();
-                            borraModReceta(con, login, recetaElegida, 'm');//opción 'b' para borrar
-                            
+                            if(login.getLvl()!=0){
+                                System.out.println("Modificar Recetas.");
+                                int recetaElegida=-1;
+
+                                /*--------- BUSCA RECETA ---------*/                              
+                                busca(etiquetas, indice, contEti, tipoBus, busqueda, con);
+
+                                System.out.println("De entre los resultados, indica el índice de la receta que quieres editar:");
+                                System.out.print(">");
+                                recetaElegida=compInput();
+                                borraModReceta(con, login, recetaElegida, 'm');//opción 'b' para borrar
+                            }
+                            else{
+                                System.out.println("No tienes permisos para modificar recetas");
+                            }
+                                
                         }
                         else {
                             System.out.println("Login necesario.");
@@ -220,16 +225,20 @@ public class Cocina_Canibal {
                         break;
                     case PUNTUAR:
                         if(logged){//requiere login
-                            System.out.println("Puntuar Recetas.");
-                            int recetaElegida=-1;
+                            if(login.getLvl()!=0){
+                                System.out.println("Puntuar Recetas.");
+                                int recetaElegida=-1;
+
+                                /*--------- BUSCA RECETA ---------*/                              
+                                busca(etiquetas, indice, contEti, tipoBus, busqueda, con);
+
+                                System.out.println("De entre los resultados, indica el índice de la receta que quieres puntuar:");
+                                System.out.print(">");
+                                recetaElegida=compInput();
+                                asignaEstrellas(con, login, recetaElegida);//en obras
+                            }
+                            else System.out.println("No tienes permisos para puntuar recetas");
                             
-                            /*--------- BUSCA RECETA ---------*/                              
-                            busca(etiquetas, indice, contEti, tipoBus, busqueda, con);
-                            
-                            System.out.println("De entre los resultados, indica el índice de la receta que quieres puntuar:");
-                            System.out.print(">");
-                            recetaElegida=compInput();
-                            asignaEstrellas(con, login, recetaElegida);//en obras
                         }
                         else {
                             System.out.println("Login necesario.");

@@ -108,7 +108,8 @@ public class Libreria {
         String creador="", nombre="", desc="", ingre="", pasos="", cod="", tags="";
         int estrellas =0;
         int existe=0, seleccion=-1;
-        
+        int[] resultados=new int[20];
+        int indexResultados=0;
         existe=Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
         int cont=1;
         if(existe==0){
@@ -123,11 +124,13 @@ public class Libreria {
                 if(!cod.equals("")){
                     nombre=con.selectToString("select nombre from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                     muestraNombreCodEstrellas(estrellas, nombre, cod);
+                    resultados[indexResultados]=Integer.parseInt(cod);
+                    indexResultados++;
                 }
                 cont++;
             }
             System.out.println("\nSelecciona la receta que deseas ver:");
-            seleccion=compInput();
+            seleccion=compInput(resultados);
             desglosaReceta(con, seleccion,  busqueda,  0,'n', nombre);
 
         }
@@ -189,19 +192,22 @@ public class Libreria {
                     //System.out.println(etiqueta[i].toString()+" = "+etiquetas[j]);
                     if(etiqueta[i].toString().contains(nom_etiquetas[j])){
                         cod_etis[cont_cod] = i;
-                        if(etiquetaFound) cod_etis[cont_cod] = i;
+                        System.out.println(etiqueta[i].toString()+" = "+nom_etiquetas[j]);
+                        System.out.println("cod_etis["+cont_cod+"] => "+cod_etis[cont_cod]);
                         cont_cod++;
                         break;
                     }
                 }
                 
             }
+            System.out.println("cont_cod => "+cont_cod);
             if(cont_cod > 0){
                 if(cont_cod==1){
                     System.out.println("==============================");
                     while(cont<=existe){                    
                         nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod="+cont+")").replaceAll(" - \n", "");                    
-                        cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
+                        cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+nom_etiquetas[cod_etis[0]]+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
+                        System.out.println("cod => "+cod);
                         if(!nombre.equals("")){
                             System.out.println("Código: "+cod+"\nNombre: "+nombre);
                         }
@@ -301,7 +307,7 @@ public class Libreria {
         }
     }
     
-    
+    //public static void 
     
     //borrar y/o modificar receta    
     public static void borraModReceta(Conexion con, Usuario login, int chosen, char opc) throws SQLException{
@@ -578,28 +584,33 @@ public class Libreria {
     //pregunta al usuario cuántas estrellas asignar a una receta - recibe el int 'cod' de la receta a puntuar - después inserta la puntuación en la BD a la receta indicada
     public static void asignaEstrellas(Conexion con, Usuario login, int cod_receta) throws SQLException{
         //Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
+        String creador=con.selectToString("select owner from recetas where cod="+cod_receta).replaceAll(" - \n", "");
         Scanner teclado=new Scanner(System.in);
         String usr=login.getUsr();
-        
+        boolean compOwnership=false;
         String fecha="(trunc(sysdate))";//se pasa sin comillas
         String opinion="";
-        int valoracion=0, n_votos=0, stars=-1;        
-        teclado.nextLine();
-        System.out.println("¿Qué opinas de esta receta?");
-        System.out.print(">");
-        opinion=teclado.nextLine();
-        do{
-            System.out.println("¿Qué valoración le das?(1-5):");
+        int valoracion=0, n_votos=0, stars=-1;
+        if(creador.equals(login.getUsr())) compOwnership=true;
+        if(compOwnership || login.getLvl()==2){
+            teclado.nextLine();
+            System.out.println("¿Qué opinas de esta receta?");
             System.out.print(">");
-            valoracion=teclado.nextInt();
-        }while(valoracion<1 || valoracion>5);
-        String insert_estrellas="insert into estrellas (usuario, receta, fecha, opinion, valoracion) values ('"+usr+"',"+cod_receta+", "+fecha+", '"+opinion+"',"+valoracion+")";
-        con.insert(insert_estrellas);
-        n_votos=Character.getNumericValue(con.selectToString("select count(*) from estrellas where receta="+cod_receta).charAt(0));
-        stars=Character.getNumericValue(con.selectToString("select sum(valoracion) from estrellas where receta="+cod_receta).charAt(0));
-        stars/=n_votos;
-        String update_recetas="update recetas set estrellas="+stars+" where cod="+cod_receta;
-        con.insert(update_recetas);
+            opinion=teclado.nextLine();
+            do{
+                System.out.println("¿Qué valoración le das?(1-5):");
+                System.out.print(">");
+                valoracion=teclado.nextInt();
+            }while(valoracion<1 || valoracion>5);
+            String insert_estrellas="insert into estrellas (usuario, receta, fecha, opinion, valoracion) values ('"+usr+"',"+cod_receta+", "+fecha+", '"+opinion+"',"+valoracion+")";
+            con.insert(insert_estrellas);
+            n_votos=Character.getNumericValue(con.selectToString("select count(*) from estrellas where receta="+cod_receta).charAt(0));
+            stars=Character.getNumericValue(con.selectToString("select sum(valoracion) from estrellas where receta="+cod_receta).charAt(0));
+            stars/=n_votos;
+            String update_recetas="update recetas set estrellas="+stars+" where cod="+cod_receta;
+            con.insert(update_recetas);
+        }
+        else System.out.println("No tienes permisos para puntuar esto.");
     }
     
     
@@ -789,6 +800,25 @@ public class Libreria {
         int aux=-1;
         try{
             aux=teclado.nextInt();
+        }catch(Exception e){
+            System.out.println("Se requiere un número entero.");
+        }
+        return aux;
+        
+    }
+    public static int compInput(int[] cosas){
+        Scanner teclado=new Scanner(System.in);
+        int aux=-1;
+        boolean error = true;
+        try{
+            do{
+                System.out.print("> ");
+                error = true;
+                aux=compInput();
+                for(int i=0; i<cosas.length; i++){
+                    if(cosas[i]==aux) error = false;
+                }
+            }while(error);
         }catch(Exception e){
             System.out.println("Se requiere un número entero.");
         }
