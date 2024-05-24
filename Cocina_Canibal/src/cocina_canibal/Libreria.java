@@ -796,7 +796,69 @@ public class Libreria {
         
     }
     
-    
+    public static void busca(String[] etiquetas, int indice, int contEti, char tipoBus, String busqueda, Conexion con) throws SQLException{
+        Scanner teclado=new Scanner(System.in);
+        etiquetas = new String[3];
+        etiquetas[0]="";
+        etiquetas[1]="";
+        etiquetas[2]="";
+        indice=-1;
+        contEti = 0;
+        tipoBus=' ';
+        teclado.nextLine();
+        System.out.println("======================");
+        System.out.println("¿Buscar Receta por Nombre / Etiqueta / Usuario?(n/e/u)");
+        //System.out.println("hola");
+        do{
+            System.out.print(">");
+            tipoBus=teclado.next().toLowerCase().charAt(0);
+            if(tipoBus=='N')tipoBus='n';
+            if(tipoBus=='E')tipoBus='e';
+        }while(tipoBus!='n' && tipoBus!='e' && tipoBus!='u');
+        System.out.println("TEST - Tipo de búsqueda: "+tipoBus);
+        if(tipoBus=='n'){
+            System.out.println("Búsqueda por Nombre: ");
+            System.out.print(">");
+            busqueda=teclado.next().toLowerCase();
+            muestraRecetasReceta(con, busqueda);
+        }
+        if(tipoBus=='e'){
+            char opcEti=' ';
+            boolean salirBusquedaEtiqueta=false;
+            System.out.println("Búsqueda por Etiqueta.");
+            do{
+                System.out.println("Añade una etiqueda a la búsqueda:");
+                System.out.print(">");
+                busqueda=teclado.next();
+                System.out.println("Desea añadir otra etiqueta? (s/n): ");
+                do{
+                    System.out.print(">");
+                    opcEti=teclado.next().charAt(0);
+                    if(opcEti=='S')opcEti='s';
+                    if(opcEti=='N')opcEti='n';
+                }while(opcEti!='s' && opcEti!='n');
+                etiquetas[contEti] = busqueda;
+                contEti++;
+                if(opcEti=='n') salirBusquedaEtiqueta=true;
+
+            }while(!salirBusquedaEtiqueta && contEti<etiquetas.length);
+            if(contEti == 1){
+                etiquetas[1] = etiquetas[0];
+                etiquetas[2] = etiquetas[0];
+            }
+            if(contEti == 2) etiquetas[2] = etiquetas[0];
+            System.out.println("Cantidad array etiquetas: "+contEti);
+            busquedaEti(con, etiquetas, busqueda, contEti);      
+
+
+        }
+        if(tipoBus=='u'){
+            System.out.println("Búsqueda por Usuario: ");
+            System.out.print(">");
+            busqueda=teclado.next();
+            muestraRecetasNombre(con, busqueda, tipoBus);
+        }
+    }
     
 }
 
