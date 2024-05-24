@@ -19,7 +19,7 @@ public class Receta {
     
     protected void oracleRegistraReceta(Conexion c) throws ClassNotFoundException, SQLException{//la inserta en la BD
         boolean exito=false;
-        String insert="insert into recetas (owner, nombre, descripcion, ingredientes, pasos) values('"+owner+"', '"+nombre+"', '"+desc+"', '"+ingredientes+"','"+pasos+"')";
+        String insert="insert into recetas (owner, nombre, descripcion, ingredientes, pasos, estrellas) values('"+owner+"', '"+nombre+"', '"+desc+"', '"+ingredientes+"','"+pasos+"', 0)";
         
         try{
             c.insert(insert);

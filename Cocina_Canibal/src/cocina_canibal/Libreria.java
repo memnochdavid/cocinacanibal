@@ -122,14 +122,7 @@ public class Libreria {
                 estrellas = Character.getNumericValue(con.selectToString("select estrellas from recetas where cod = "+cont).charAt(0));
                 if(!cod.equals("")){
                     nombre=con.selectToString("select nombre from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
-                    System.out.println("\n=======================================");
-                    System.out.print("Código: "+cod+"\nNombre: "+nombre+"\nPuntuacion: ");
-                    if(estrellas == 0) System.out.println("");
-                    if(estrellas == 1) System.out.println("\u001B[33m★\u001B[30m");
-                    if(estrellas == 2) System.out.println("\u001B[33m★★\u001B[30m");
-                    if(estrellas == 3) System.out.println("\u001B[33m★★★\u001B[30m");
-                    if(estrellas == 4) System.out.println("\u001B[33m★★★★\u001B[30m");
-                    if(estrellas == 5) System.out.println("\u001B[33m★★★★★\u001B[30m");
+                    muestraNombreCodEstrellas(estrellas, nombre, cod);
                 }
                 cont++;
             }
@@ -139,6 +132,16 @@ public class Libreria {
 
         }
         
+    }
+    public static void muestraNombreCodEstrellas(int estrellas, String nombre, String cod){
+        System.out.println("\n=======================================");
+        System.out.print("Código: "+cod+"\nNombre: "+nombre+"\nPuntuacion: ");
+        if(estrellas == 0) System.out.println("No tiene valoraciones");
+        if(estrellas == 1) System.out.println("\u001B[33m★\u001B[30m");
+        if(estrellas == 2) System.out.println("\u001B[33m★★\u001B[30m");
+        if(estrellas == 3) System.out.println("\u001B[33m★★★\u001B[30m");
+        if(estrellas == 4) System.out.println("\u001B[33m★★★★\u001B[30m");
+        if(estrellas == 5) System.out.println("\u001B[33m★★★★★\u001B[30m");
     }
     public static void muestraRecetasNombre(Conexion con, String busqueda, char opc) throws SQLException{
         String creador="", nombre="", desc="", ingre="", pasos="", cod="", tags="";
@@ -153,18 +156,11 @@ public class Libreria {
         else{
             while(cont<=existe){
                 //Character.getNumericValue(con.selectToString("select estrellas from recetas where cod = "+cont).charAt(0));
-                nombre=con.selectToString("select nombre from recetas where owner like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                 cod=con.selectToString("select cod from recetas where owner like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
                 estrellas = Character.getNumericValue(con.selectToString("select estrellas from recetas where cod = "+cont).charAt(0));
                 if(!cod.equals("")){
-                    System.out.println("\n=======================================");
-                    System.out.print("Código: "+cod+"\nNombre: "+nombre+"\nPuntuacion: ");
-                    if(estrellas == 0) System.out.println("");
-                    if(estrellas == 1) System.out.println("\u001B[33m★\u001B[30m");
-                    if(estrellas == 2) System.out.println("\u001B[33m★★\u001B[30m");
-                    if(estrellas == 3) System.out.println("\u001B[33m★★★\u001B[30m");
-                    if(estrellas == 4) System.out.println("\u001B[33m★★★★\u001B[30m");
-                    if(estrellas == 5) System.out.println("\u001B[33m★★★★★\u001B[30m");
+                    nombre=con.selectToString("select nombre from recetas where owner like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
+                    muestraNombreCodEstrellas(estrellas, nombre, cod);
                 }
                 cont++;
             }
@@ -705,7 +701,7 @@ public class Libreria {
         String tablaUsu = "create table usuarios (usr 	varchar2(25),pass    varchar2(100) not null,mail    varchar2(50),lvl     number(1) check (lvl between 0 and 2),constraint pk_usuarios primary key (usr))";
         //original - funciona - NO BORRAR- String tablaRece = "create table recetas(cod	    integer generated always as identity (start with 1 increment by 1),owner 	varchar2(25),nombre  varchar2(25),descripcion    varchar2(100) not null,ingredientes varchar2(550), pasos   varchar2(500), constraint pk_recetas primary key (cod),constraint fk_rec_usu foreign key (owner) references usuarios(usr))";
         //nuevo "create table con estrellas"
-        String tablaRece = "create table recetas(cod integer generated always as identity (start with 1 increment by 1), owner 	varchar2(25), nombre  varchar2(25), descripcion    varchar2(100) not null, ingredientes varchar2(550), pasos   varchar2(500), estrellas number(1,0) check (estrellas between 1 and 5), constraint pk_recetas primary key (cod), constraint fk_rec_usu foreign key (owner) references usuarios(usr))";
+        String tablaRece = "create table recetas(cod integer generated always as identity (start with 1 increment by 1), owner 	varchar2(25), nombre  varchar2(25), descripcion    varchar2(100) not null, ingredientes varchar2(550), pasos   varchar2(500), estrellas number(1,0) check (estrellas between 0 and 5), constraint pk_recetas primary key (cod), constraint fk_rec_usu foreign key (owner) references usuarios(usr))";
         String tablaEtiq ="create table etiqueta (id integer generated always as identity (start with 1 increment by 1) primary key, nom varchar2(30))";
         String tablaRec_Et="create table rec_et (cod	    number(3), id      integer, constraint pk_rec_et primary key(cod, id),constraint fk_rec_re foreign key (cod) references recetas(cod))";
         String tablaStars="create table estrellas (usuario varchar(25),receta number(3),fecha date, opinion varchar2(500),valoracion number(1)check(valoracion between 1 and 5),constraint pk_estrellas primary key (usuario, receta, fecha), constraint fk_estre_usu foreign key (usuario) references usuarios(usr), constraint fk_estre_rec foreign key (receta) references recetas(cod))";
