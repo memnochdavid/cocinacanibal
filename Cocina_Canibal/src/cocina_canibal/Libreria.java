@@ -619,29 +619,35 @@ public class Libreria {
         String creador=con.selectToString("select owner from recetas where cod="+cod_receta).replaceAll(" - \n", "");
         Scanner teclado=new Scanner(System.in);
         String usr=login.getUsr();
-        boolean compOwnership=false;
+        boolean compOwnership=false, ya_puntuado=false;        
         String fecha="(trunc(sysdate))";//se pasa sin comillas
         String opinion="";
         int valoracion=0, n_votos=0, stars=-1;
         //if(creador.equals(login.getUsr())) compOwnership=true;// sólo deja puntuar al dueño
         if(login.getLvl()>0) compOwnership=true; //permite a cualquier usuario logueado puntuar cualquier receta, sea suya o no
         if(compOwnership || login.getLvl()==2){
-            teclado.nextLine();
-            System.out.println("¿Qué opinas de esta receta?");
-            System.out.print(">");
-            opinion=teclado.nextLine();
-            do{
-                System.out.println("¿Qué valoración le das?(1-5):");
+            if(login.getUsr().contentEquals(con.selectToString("select usuario from estrellas where receta="+cod_receta).replaceAll(" - \n", ""))){
+                ya_puntuado=true;
+            }
+            if(!ya_puntuado){
+                teclado.nextLine();
+                System.out.println("¿Qué opinas de esta receta?");
                 System.out.print(">");
-                valoracion=teclado.nextInt();
-            }while(valoracion<1 || valoracion>5);
-            String insert_estrellas="insert into estrellas (usuario, receta, fecha, opinion, valoracion) values ('"+usr+"',"+cod_receta+", "+fecha+", '"+opinion+"',"+valoracion+")";
-            con.insert(insert_estrellas);
-            n_votos=Character.getNumericValue(con.selectToString("select count(*) from estrellas where receta="+cod_receta).charAt(0));
-            stars=Character.getNumericValue(con.selectToString("select sum(valoracion) from estrellas where receta="+cod_receta).charAt(0));
-            stars/=n_votos;
-            String update_recetas="update recetas set estrellas="+stars+" where cod="+cod_receta;
-            con.insert(update_recetas);
+                opinion=teclado.nextLine();
+                do{
+                    System.out.println("¿Qué valoración le das?(1-5):");
+                    System.out.print(">");
+                    valoracion=teclado.nextInt();
+                }while(valoracion<1 || valoracion>5);
+                String insert_estrellas="insert into estrellas (usuario, receta, fecha, opinion, valoracion) values ('"+usr+"',"+cod_receta+", "+fecha+", '"+opinion+"',"+valoracion+")";
+                con.insert(insert_estrellas);
+                n_votos=Character.getNumericValue(con.selectToString("select count(*) from estrellas where receta="+cod_receta).charAt(0));
+                stars=Character.getNumericValue(con.selectToString("select sum(valoracion) from estrellas where receta="+cod_receta).charAt(0));
+                stars/=n_votos;
+                String update_recetas="update recetas set estrellas="+stars+" where cod="+cod_receta;
+                con.insert(update_recetas);
+            }
+            else System.out.println("Ya has puntuado esta receta.");
         }
         else System.out.println("No tienes permisos para puntuar esto.");
     }
