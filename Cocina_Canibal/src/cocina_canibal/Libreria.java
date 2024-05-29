@@ -221,7 +221,7 @@ public class Libreria {
                 if(cont_cod==2){
                     System.out.println("==============================");
                     while(cont<=existe){
-                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+ "and id="+cod_etis[1]+") and cod="+cont).replaceAll(" - \n", "");                    
+                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct cod from rec_et where id="+cod_etis[1]+"))"+cont).replaceAll(" - \n", "");                    
                         cod=con.selectToString("select cod from recetas where cod ="+cont).replaceAll(" - \n", "");
                         if(!nombre.equals("")){
                             System.out.println("Código: "+cont+"\nNombre: "+nombre);
@@ -233,7 +233,7 @@ public class Libreria {
                 if(cont_cod==3){
                     System.out.println("==============================");
                     while(cont<=existe){
-                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+ "and id="+cod_etis[1]+" and id="+cod_etis[2]+") and cod="+cont).replaceAll(" - \n", "");                    
+                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in(select distinct cod from rec_et where id="+cod_etis[1]+" and cod in (select distinct cod from rec_et where id="+cod_etis[2]+"))) and cod="+cont).replaceAll(" - \n", "");                    
                         cod=con.selectToString("select cod from recetas where cod ="+cont).replaceAll(" - \n", "");
                         if(!nombre.equals("")){
                             System.out.println("Código: "+cont+"\nNombre: "+nombre);
