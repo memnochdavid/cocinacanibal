@@ -216,7 +216,7 @@ public class Cocina_Canibal {
                                 /*--------- BUSCA RECETA ---------*/                              
                                 busca(etiquetas, indice, contEti, tipoBus, busqueda, con);
 
-                                System.out.println("De entre los resultados, indica el índice de la receta que quieres editar:");
+                                System.out.println("Indica el índice de la receta que quieres editar para confirmar:");
                                 System.out.print(">");
                                 recetaElegida=compInput();
                                 borraModReceta(con, login, recetaElegida, 'm');//opción 'b' para borrar

@@ -310,15 +310,17 @@ public class Libreria {
             System.out.println("==================="); 
         }
         if(opc=='e'){
-            System.out.println("EtiquetaFound => "+EtiquetaFound);
-            System.out.println("indice => "+indice);
+            //System.out.println("EtiquetaFound => "+EtiquetaFound);
+            //System.out.println("indice => "+indice);
             tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
-            creador=con.selectToString("select owner from recetas where cod in (select cod from rec_et where id in (select id from etiqueta where id ="+indice+"))").replaceAll(" - \n", "");
-            desc=con.selectToString("select descripcion from recetas where cod in (select cod from rec_et where cod="+indice+")").replaceAll(" - \n", "");
-            ingre=con.selectToString("select ingredientes from recetas where cod in (select cod from rec_et where cod="+indice+")").replaceAll(" - \n", "");
-            pasos=con.selectToString("select pasos from recetas where cod in (select cod from rec_et where cod="+indice+")").replaceAll(" - \n", "").replaceAll(" - ", "\n");
-            valoracion=con.selectToString("select estrellas from recetas where cod in (select cod from rec_et where id in (select id from etiqueta where id ="+indice+"))").replaceAll(" - \n", "").replaceAll(" - ", "\n");
-            nombre = nombre.toUpperCase();
+            creador=con.selectToString("select owner from recetas where cod="+indice).replaceAll(" - \n", "");
+            //String cread=con.selectToString("select owner from recetas where cod="+indice).replaceAll(" - \n", "");;
+            desc=con.selectToString("select descripcion from recetas where cod="+indice).replaceAll(" - \n", "");
+            ingre=con.selectToString("select ingredientes from recetas where cod="+indice).replaceAll(" - \n", "");
+            pasos=con.selectToString("select pasos from recetas where cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            valoracion=con.selectToString("select estrellas from recetas where cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            nombre=con.selectToString("select nombre from recetas where cod="+indice).replaceAll(" - \n", "").toUpperCase();
+            //nombre = nombre.toUpperCase();
             estrellas = Integer.parseInt(valoracion);
             if(estrellas == 0) System.out.println("No tiene valoraciones");
             if(estrellas == 1) System.out.println("\n======= "+nombre+" \u001B[33m★\u001B[30m =======");
