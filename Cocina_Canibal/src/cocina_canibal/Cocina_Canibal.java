@@ -17,7 +17,6 @@ public class Cocina_Canibal {
         Usuario login=null;
         Receta recetaCrea;
         Conexion con=new Conexion();
-       //devuelveEtiquetas();
         do{
             do{
                 opcionIni=menuIni();
@@ -77,9 +76,6 @@ public class Cocina_Canibal {
                         System.out.print(">");
                         pass=teclado.next();
                         pass=cifrarContrasena(pass);//se cifra
-                        //System.out.println("\u001B[35meMail:\033[30m");
-                        //System.out.print(">");
-                        //mail=teclado.next();
                         System.out.println("\033[34m======================="+formatString("reset"));
                         lvl=compruebaPrivilegiosCredenciales(con, usr, pass);//recibe un int correspondiente al lvl de acceso del usuario a comprobar. Si no existe, el lvl es 0. Si es un admin, el lvl es 2, si es un usuario ya registrado, el lvl de acceso es 1
                         if(lvl==0){//no existe
@@ -239,7 +235,7 @@ public class Cocina_Canibal {
                                 /*--------- BUSCA RECETA ---------*/                              
                                 busca(etiquetas, indice, contEti, tipoBus, busqueda, con);
 
-                                System.out.println("De entre los resultados, indica el índice de la receta que quieres puntuar:");
+                                System.out.println("Indica el índice de la receta que quieres puntuar para confirmar:");
                                 System.out.print(">");
                                 recetaElegida=compInput();
                                 asignaEstrellas(con, login, recetaElegida);//en obras

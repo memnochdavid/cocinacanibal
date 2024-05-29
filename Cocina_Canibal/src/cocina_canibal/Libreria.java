@@ -16,7 +16,7 @@ public class Libreria {
         
         do{
             System.out.println(formatString("verde")+"=========================="+formatString("reset"));
-            System.out.println("   MENU de "+formatString("verde")+"Base de Datos"+formatString("reset")+"  ");
+            System.out.println(formatString("verde")+"   MENU de "+"Base de Datos"+formatString("reset")+"  ");
             System.out.println(formatString("verde")+"=========================="+formatString("reset"));
             System.out.println("1. Base de Datos - Set up");
             System.out.println("2. Base de Datos - Set up + inserts");
@@ -36,7 +36,7 @@ public class Libreria {
         
         do{
             System.out.println(formatString("verde")+"=========================="+formatString("reset"));
-            System.out.println("      MENU de "+formatString("verde")+"LOGIN"+formatString("reset")+"      ");
+            System.out.println(formatString("verde")+"      MENU de "+"LOGIN"+formatString("reset")+"      ");
             System.out.println(formatString("verde")+"=========================="+formatString("reset"));
             System.out.println("1. Registrar Usuario.");
             System.out.println("2. Login.");
@@ -57,7 +57,7 @@ public class Libreria {
         int opcion;
         do{
             System.out.println(formatString("verde")+"=========================="+formatString("reset"));
-            System.out.println("   MENU de \033[34mRecetas"+formatString("reset"));
+            System.out.println(formatString("verde")+"   MENU de RECETAS"+formatString("reset"));
             System.out.println(formatString("verde")+"=========================="+formatString("reset"));
             System.out.println("1. Crea Receta.");
             System.out.println("2. Busca Receta.");
@@ -623,7 +623,8 @@ public class Libreria {
         String fecha="(trunc(sysdate))";//se pasa sin comillas
         String opinion="";
         int valoracion=0, n_votos=0, stars=-1;
-        if(creador.equals(login.getUsr())) compOwnership=true;
+        //if(creador.equals(login.getUsr())) compOwnership=true;// sólo deja puntuar al dueño
+        if(login.getLvl()>0) compOwnership=true; //permite a cualquier usuario logueado puntuar cualquier receta, sea suya o no
         if(compOwnership || login.getLvl()==2){
             teclado.nextLine();
             System.out.println("¿Qué opinas de esta receta?");
