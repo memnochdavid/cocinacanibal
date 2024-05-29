@@ -195,22 +195,22 @@ public class Libreria {
                     //System.out.println(etiqueta[i].toString()+" = "+etiquetas[j]);
                     if(etiqueta[i].toString().contains(nom_etiquetas[j])){
                         cod_etis[cont_cod] = i;
-                        System.out.println(etiqueta[i].toString()+" = "+nom_etiquetas[j]);
-                        System.out.println("cod_etis["+cont_cod+"] => "+cod_etis[cont_cod]);
+                        //System.out.println(etiqueta[i].toString()+" = "+nom_etiquetas[j]);
+                        //System.out.println("cod_etis["+cont_cod+"] => "+cod_etis[cont_cod]);
                         cont_cod++;
                         break;
                     }
                 }
                 
             }
-            System.out.println("cont_cod => "+cont_cod);
+            //System.out.println("cont_cod => "+cont_cod);
             if(cont_cod > 0){
                 if(cont_cod==1){
                     System.out.println("==============================");
                     while(cont<=existe){ 
-                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+")and cod="+cont).replaceAll(" - \n", "");                    
+                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+") and cod="+cont).replaceAll(" - \n", "");                    
                         cod=con.selectToString("select cod from recetas where cod ="+cont).replaceAll(" - \n", "");
-                        System.out.println("cod => "+cod);
+                        //System.out.println("cod => "+cod);
                         if(!nombre.equals("")){
                             System.out.println("Código: "+cont+"\nNombre: "+nombre);
                         }
@@ -221,7 +221,7 @@ public class Libreria {
                 if(cont_cod==2){
                     System.out.println("==============================");
                     while(cont<=existe){
-                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct cod from rec_et where id="+cod_etis[1]+"))"+cont).replaceAll(" - \n", "");                    
+                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct cod from rec_et where id="+cod_etis[1]+")) and cod="+cont).replaceAll(" - \n", "");                    
                         cod=con.selectToString("select cod from recetas where cod ="+cont).replaceAll(" - \n", "");
                         if(!nombre.equals("")){
                             System.out.println("Código: "+cont+"\nNombre: "+nombre);
@@ -941,7 +941,7 @@ public class Libreria {
             if(tipoBus=='N')tipoBus='n';
             if(tipoBus=='E')tipoBus='e';
         }while(tipoBus!='n' && tipoBus!='e' && tipoBus!='u');
-        System.out.println("TEST - Tipo de búsqueda: "+tipoBus);
+        //System.out.println("TEST - Tipo de búsqueda: "+tipoBus);
         if(tipoBus=='n'){
             System.out.println("Búsqueda por Nombre: ");
             System.out.print(">");
@@ -973,7 +973,7 @@ public class Libreria {
                 etiquetas[2] = etiquetas[0];
             }
             if(contEti == 2) etiquetas[2] = etiquetas[0];
-            System.out.println("Cantidad array etiquetas: "+contEti);
+            //System.out.println("Cantidad array etiquetas: "+contEti);
             busquedaEti(con, etiquetas, busqueda, contEti);      
 
 
