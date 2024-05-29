@@ -89,7 +89,7 @@ public class Libreria {
         try{
             lvl= Character.getNumericValue(con.selectToString(select).charAt(0));  //guarda como int el primer char que devuelve con.selectToString(consulta), que es el lvl de permiso
         }catch(Exception e){
-            System.out.println("El usuario no existe. Sesión básica.");
+            System.out.println(formatString("rojo")+"El usuario no existe. Sesión básica."+formatString("reset"));
         }        
         return lvl;
     }
@@ -101,7 +101,7 @@ public class Libreria {
             select="select * from usuarios";
             con.select(select);
         }
-        else System.out.println("Sólo para admin.");
+        else System.out.println(formatString("rojo")+"Sólo para admin."+formatString("reset"));
     }
     
     //muestra las recetas - recibe un String búsqueda y un char opc que especifica el modo de búsqueda, si por tags o por nombre 
@@ -114,7 +114,7 @@ public class Libreria {
         existe=Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
         int cont=1;
         if(existe==0){
-            System.out.println("No se han encontrado coincidencias.");
+            System.out.println(formatString("rojo")+"No se han encontrado coincidencias."+formatString("reset"));
             System.out.println("Búsqueda: "+busqueda);
         }
         else{
@@ -155,7 +155,7 @@ public class Libreria {
         existe=Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
         int cont=1;
         if(existe==0){
-            System.out.println("No se han encontrado coincidencias.");
+            System.out.println(formatString("rojo")+"No se han encontrado coincidencias."+formatString("reset"));
             System.out.println("Búsqueda: "+busqueda);
         }
         else{
@@ -206,7 +206,7 @@ public class Libreria {
             //System.out.println("cont_cod => "+cont_cod);
             if(cont_cod > 0){
                 if(cont_cod==1){
-                    System.out.println("==============================");
+                    System.out.println(formatString("verde")+"=============================="+formatString("reset"));
                     while(cont<=existe){ 
                         nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+") and cod="+cont).replaceAll(" - \n", "");                    
                         cod=con.selectToString("select cod from recetas where cod ="+cont).replaceAll(" - \n", "");
@@ -215,11 +215,11 @@ public class Libreria {
                             System.out.println("Código: "+cont+"\nNombre: "+nombre);
                         }
                             cont++;
-                            System.out.println("==============================");
+                            System.out.println(formatString("verde")+"=============================="+formatString("reset"));
                         }
                 }
                 if(cont_cod==2){
-                    System.out.println("==============================");
+                    System.out.println(formatString("verde")+"=============================="+formatString("reset"));
                     while(cont<=existe){
                         nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct cod from rec_et where id="+cod_etis[1]+")) and cod="+cont).replaceAll(" - \n", "");                    
                         cod=con.selectToString("select cod from recetas where cod ="+cont).replaceAll(" - \n", "");
@@ -227,11 +227,11 @@ public class Libreria {
                             System.out.println("Código: "+cont+"\nNombre: "+nombre);
                         }
                             cont++;
-                            System.out.println("==============================");
+                            System.out.println(formatString("verde")+"=============================="+formatString("reset"));
                         }
                 }
                 if(cont_cod==3){
-                    System.out.println("==============================");
+                    System.out.println(formatString("verde")+"=============================="+formatString("reset"));
                     while(cont<=existe){
                         nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in(select distinct cod from rec_et where id="+cod_etis[1]+" and cod in (select distinct cod from rec_et where id="+cod_etis[2]+"))) and cod="+cont).replaceAll(" - \n", "");                    
                         cod=con.selectToString("select cod from recetas where cod ="+cont).replaceAll(" - \n", "");
@@ -239,7 +239,7 @@ public class Libreria {
                             System.out.println("Código: "+cont+"\nNombre: "+nombre);
                         }
                             cont++;
-                            System.out.println("==============================");
+                            System.out.println(formatString("verde")+"=============================="+formatString("reset"));
                     }
                 }
                 //System.out.println("cod_etis.length: "+cod_etis.length);
@@ -279,9 +279,9 @@ public class Libreria {
             System.out.println("Creador: "+creador);
             System.out.println("Descripcion: "+desc);
             System.out.println("Ingredientes: "+ingre);
-            System.out.println("===================");
+            System.out.println(formatString("verde")+"==================="+formatString("reset"));
             System.out.println("Pasos: \n"+pasos);
-            System.out.println("===================");
+            System.out.println(formatString("verde")+"==================="+formatString("reset"));
             /* PARTE DE LAS VALORACIONES */
             
         }
@@ -300,14 +300,14 @@ public class Libreria {
             if(estrellas == 3) System.out.println("\n======= "+nombre+" \u001B[33m★★★\u001B[30m =======");
             if(estrellas == 4) System.out.println("\n======= "+nombre+" \u001B[33m★★★★\u001B[30m =======");
             if(estrellas == 5) System.out.println("\n======= "+nombre+" \u001B[33m★★★★★\u001B[30m =======");
-            System.out.println("\n======= "+nombre+" =======");   
+            System.out.println(formatString("verde")+"\n======= "+nombre+formatString("verde")+" ======="+formatString("reset"));   
             System.out.println("Tags: "+tags);
             System.out.println("Creador: "+creador);
             System.out.println("Descripcion: "+desc);
             System.out.println("Ingredientes: "+ingre);
-            System.out.println("===================");
+            System.out.println(formatString("verde")+"==================="+formatString("reset"));
             System.out.println("Pasos: \n"+pasos);
-            System.out.println("==================="); 
+            System.out.println(formatString("verde")+"==================="+formatString("reset")); 
         }
         if(opc=='e'){
             //System.out.println("EtiquetaFound => "+EtiquetaFound);
@@ -328,14 +328,14 @@ public class Libreria {
             if(estrellas == 3) System.out.println("\n======= "+nombre+" \u001B[33m★★★\u001B[30m =======");
             if(estrellas == 4) System.out.println("\n======= "+nombre+" \u001B[33m★★★★\u001B[30m =======");
             if(estrellas == 5) System.out.println("\n======= "+nombre+" \u001B[33m★★★★★\u001B[30m =======");
-            System.out.println("\n======= "+nombre+" =======");   
+            System.out.println(formatString("verde")+"\n======= "+formatString("reset")+nombre+formatString("verde")+" ======="+formatString("reset"));   
             System.out.println("Tags: "+tags);
             System.out.println("Creador: "+creador);
             System.out.println("Descripcion: "+desc);
             System.out.println("Ingredientes: "+ingre);
-            System.out.println("===================");
+            System.out.println(formatString("verde")+"==================="+formatString("reset"));
             System.out.println("Pasos: \n"+pasos);
-            System.out.println("===================");   
+            System.out.println(formatString("verde")+"==================="+formatString("reset"));   
         }
     }
     
@@ -358,11 +358,7 @@ public class Libreria {
             }
             if(opc=='m'){//opc 'm' para modificar - pregunta qué elemento o elementos modificar, el resto los consulta y los mantiene. Sólo alterará los que le pidamos
                 Scanner teclado=new Scanner(System.in, "ISO-8859-2");
-                String nombre=con.selectToString("select nombre from recetas where cod="+chosen).replaceAll(" - \n", "");
-                String desc=con.selectToString("select descripcion from recetas where cod="+chosen).replaceAll(" - \n", "");
-                String ingre=con.selectToString("select ingredientes from recetas where cod="+chosen).replaceAll(" - \n", "");
-                String pasos=con.selectToString("select pasos from recetas where cod="+chosen).replaceAll(" - \n", "");
-                String tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+chosen+")").replaceAll(" - \n", ", ");
+                String nombre, desc, ingre, pasos;
                 String updateRece="";
                 int opcion=-1;
                 char end='n';
@@ -474,7 +470,7 @@ public class Libreria {
         String nombre;
         char opc;
         //sc.nextLine();
-        System.out.println("================================");
+        System.out.println(formatString("verde")+"================================"+formatString("reset"));
         System.out.println("\nVamos a añadir ingresientes..");
         do{
             System.out.println("Introduce el nombre del ingrediente: ");
@@ -508,7 +504,7 @@ public class Libreria {
         String res="";
         String paso;
         char opc;
-        System.out.println("================================");
+        System.out.println(formatString("verde")+"================================"+formatString("reset"));
         System.out.println("\nVamos a enumerar los pasos de esta receta...");
         do{
             sc.nextLine();
@@ -540,9 +536,9 @@ public class Libreria {
         int opcion;
         boolean noMostrar = false; //Para que muestrre o no
         do{
-            System.out.println("--------------------------");
-            System.out.println("------ ETIQUETAS ------");
-            System.out.println("--------------------------");
+            System.out.println(formatString("verde")+"--------------------------"+formatString("reset"));
+            System.out.println(formatString("verde")+"------"+formatString("reset")+ "ETIQUETAS"+" ------"+formatString("reset"));
+            System.out.println(formatString("verde")+"--------------------------"+formatString("reset"));
             for(int i=1; i<etiqueta.length; i++){// i empieza en 1 para evitar la posición cero, que contiene una entrada dummy. Así se evita que la primera opción aparezca en rojo
                 noMostrar = false; //Reinicio variable
                 for(int j=0; j<opcEt.length; j++){
@@ -626,30 +622,47 @@ public class Libreria {
         //if(creador.equals(login.getUsr())) compOwnership=true;// sólo deja puntuar al dueño
         if(login.getLvl()>0) compOwnership=true; //permite a cualquier usuario logueado puntuar cualquier receta, sea suya o no
         if(compOwnership || login.getLvl()==2){
-            if(login.getUsr().contentEquals(con.selectToString("select usuario from estrellas where receta="+cod_receta).replaceAll(" - \n", ""))){
-                ya_puntuado=true;
-            }
-            if(!ya_puntuado){
-                teclado.nextLine();
-                System.out.println("¿Qué opinas de esta receta?");
-                System.out.print(">");
-                opinion=teclado.nextLine();
-                do{
-                    System.out.println("¿Qué valoración le das?(1-5):");
+            //do
+            do{
+                if(con.selectToString("select usuario from estrellas where receta="+cod_receta).replaceAll(" - \n", "").contains(login.getUsr())){
+                    ya_puntuado=true;
+                }
+                if(!ya_puntuado){
+                    teclado.nextLine();
+                    System.out.println("¿Qué opinas de esta receta?");
                     System.out.print(">");
-                    valoracion=teclado.nextInt();
-                }while(valoracion<1 || valoracion>5);
-                String insert_estrellas="insert into estrellas (usuario, receta, fecha, opinion, valoracion) values ('"+usr+"',"+cod_receta+", "+fecha+", '"+opinion+"',"+valoracion+")";
-                con.insert(insert_estrellas);
-                n_votos=Character.getNumericValue(con.selectToString("select count(*) from estrellas where receta="+cod_receta).charAt(0));
-                stars=Character.getNumericValue(con.selectToString("select sum(valoracion) from estrellas where receta="+cod_receta).charAt(0));
-                stars/=n_votos;
-                String update_recetas="update recetas set estrellas="+stars+" where cod="+cod_receta;
-                con.insert(update_recetas);
-            }
-            else System.out.println("Ya has puntuado esta receta.");
+                    opinion=teclado.nextLine();
+                    do{
+                        System.out.println("¿Qué valoración le das?(1-5):");
+                        System.out.print(">");
+                        valoracion=teclado.nextInt();
+                    }while(valoracion<1 || valoracion>5);
+                    String insert_estrellas="insert into estrellas (usuario, receta, fecha, opinion, valoracion) values ('"+usr+"',"+cod_receta+", "+fecha+", '"+opinion+"',"+valoracion+")";
+                    con.insert(insert_estrellas);
+                    n_votos=Character.getNumericValue(con.selectToString("select count(*) from estrellas where receta="+cod_receta).charAt(0));
+                    stars=Character.getNumericValue(con.selectToString("select sum(valoracion) from estrellas where receta="+cod_receta).charAt(0));
+                    stars/=n_votos;
+                    String update_recetas="update recetas set estrellas="+stars+" where cod="+cod_receta;
+                    con.insert(update_recetas);
+                }
+                else{
+                    char borrar=' ';
+                    System.out.println("Ya has puntuado esta receta. ¿Quieres borrar tu opinión? (s/n)");
+                    do{
+                        System.out.print(">");
+                        borrar=teclado.next().charAt(0);
+                        if(borrar=='S')borrar='s';
+                        if(borrar=='N')borrar='n';
+                    }while(borrar!='s' && borrar!='n');
+                    if(borrar=='s'){
+                        con.insert("delete from estrellas where usuario='"+login.getUsr()+"' and receta="+cod_receta);
+                        ya_puntuado=false;
+                    }
+                    else break;
+                }
+            }while(!ya_puntuado);
         }
-        else System.out.println("No tienes permisos para puntuar esto.");
+        else System.out.println(formatString("rojo")+"No tienes permisos para puntuar esto."+formatString("reset"));
     }
     
     
@@ -941,7 +954,7 @@ public class Libreria {
         contEti = 0;
         tipoBus=' ';
         teclado.nextLine();
-        System.out.println("======================");
+        System.out.println(formatString("verde")+"======================"+formatString("reset"));
         System.out.println("¿Buscar Receta por Nombre / Etiqueta / Usuario?(n/e/u)");
         //System.out.println("hola");
         do{
@@ -982,7 +995,6 @@ public class Libreria {
                 etiquetas[2] = etiquetas[0];
             }
             if(contEti == 2) etiquetas[2] = etiquetas[0];
-            //System.out.println("Cantidad array etiquetas: "+contEti);
             busquedaEti(con, etiquetas, busqueda, contEti);      
 
 

@@ -56,4 +56,5 @@ public class Conexion {
     public void cierre() throws SQLException{//cierra la conexión
         con.close();
     }
+   
 }
