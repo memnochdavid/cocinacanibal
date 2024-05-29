@@ -22,11 +22,18 @@ public class Cocina_Canibal {
             do{
                 opcionIni=menuIni();
                 do{
+                    System.out.println("opcionIni => "+opcionIni);
                     switch(opcionIni){
                         case SET_BD:
                             destroyAll(con); //ANDAR CON OJETE
                             BDsetUp(con);//crea todo lo necesario para usar la apli sin necesidad de usar ORACLE
                             salirIni=true;
+                            break;
+                        case SET_BD_INS:
+                            destroyAll(con); //ANDAR CON OJETE
+                            BDsetUpIns(con);//crea todo lo necesario para usar la apli sin necesidad de usar ORACLE e inserta tablas a test
+                            salirIni=true;
+                            break;
                         case SALIR:
                             salirIni=true;
                             break;

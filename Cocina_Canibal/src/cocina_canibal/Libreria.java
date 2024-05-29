@@ -19,10 +19,11 @@ public class Libreria {
             System.out.println("   MENU de "+formatString("verde")+"Base de Datos"+formatString("reset")+"  ");
             System.out.println(formatString("verde")+"=========================="+formatString("reset"));
             System.out.println("1. Base de Datos - Set up");
-            System.out.println("2. Continuar.");
+            System.out.println("2. Base de Datos - Set up + inserts");
+            System.out.println("3. Continuar.");
             System.out.print("> ");
             opcion=compInput();
-        }while(opcion<1 || opcion>2);
+        }while(opcion<1 || opcion>3);
         opcion-=1;
         return opciones[opcion];
     }
@@ -108,7 +109,7 @@ public class Libreria {
         String creador="", nombre="", desc="", ingre="", pasos="", cod="", tags="";
         int estrellas =0;
         int existe=0, seleccion=-1;
-        int[] resultados=new int[20];
+        int[] resultados=new int[20], dummy={0,0,0};;
         int indexResultados=0;
         existe=Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
         int cont=1;
@@ -131,7 +132,7 @@ public class Libreria {
             }
             System.out.println("\nSelecciona la receta que deseas ver:");
             seleccion=compInput(resultados);
-            desglosaReceta(con, seleccion,  busqueda,  0,'n', nombre);
+            desglosaReceta(con, seleccion,  busqueda,  0,'n', nombre, dummy);
 
         }
         
@@ -150,6 +151,7 @@ public class Libreria {
         String creador="", nombre="", desc="", ingre="", pasos="", cod="", tags="";
         int estrellas =0;
         int existe=0, seleccion=-1;
+        int[] dummy={0,0,0};
         existe=Character.getNumericValue(con.selectToString("select count(*) from recetas").charAt(0));
         int cont=1;
         if(existe==0){
@@ -170,10 +172,11 @@ public class Libreria {
             System.out.println("Selecciona la receta que deseas ver:");
             seleccion=compInput();
             
-            cod=con.selectToString("select cod from recetas where owner like'%"+busqueda+"%' and cod="+cont).replaceAll(" - \n", "");
+            cod=con.selectToString("select cod from recetas where owner like'%"+busqueda+"%' and cod="+seleccion).replaceAll(" - \n", "");
+            nombre=con.selectToString("select nombre from recetas where owner like'%"+busqueda+"%' and cod="+seleccion).replaceAll(" - \n", "");
             int codRec = Integer.parseInt(cod);
             
-            desglosaReceta(con, seleccion,  busqueda,  codRec,'n', nombre);
+            desglosaReceta(con, seleccion,  busqueda,  codRec,'u', nombre, dummy);
         }
     }
     public static void busquedaEti(Conexion con, String[] nom_etiquetas, String busqueda, int conEti) throws SQLException{//busca por etiqueta
@@ -204,12 +207,12 @@ public class Libreria {
             if(cont_cod > 0){
                 if(cont_cod==1){
                     System.out.println("==============================");
-                    while(cont<=existe){                    
-                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod="+cont+")").replaceAll(" - \n", "");                    
-                        cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+nom_etiquetas[cod_etis[0]]+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
+                    while(cont<=existe){ 
+                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+")and cod="+cont).replaceAll(" - \n", "");                    
+                        cod=con.selectToString("select cod from recetas where cod ="+cont).replaceAll(" - \n", "");
                         System.out.println("cod => "+cod);
                         if(!nombre.equals("")){
-                            System.out.println("Código: "+cod+"\nNombre: "+nombre);
+                            System.out.println("Código: "+cont+"\nNombre: "+nombre);
                         }
                             cont++;
                             System.out.println("==============================");
@@ -217,11 +220,11 @@ public class Libreria {
                 }
                 if(cont_cod==2){
                     System.out.println("==============================");
-                    while(cont<=existe){                    
-                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[1]+" and cod="+cont+"))").replaceAll(" - \n", "");                    
-                        cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
+                    while(cont<=existe){
+                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+ "and id="+cod_etis[1]+") and cod="+cont).replaceAll(" - \n", "");                    
+                        cod=con.selectToString("select cod from recetas where cod ="+cont).replaceAll(" - \n", "");
                         if(!nombre.equals("")){
-                            System.out.println("Código: "+cod+"\nNombre: "+nombre);
+                            System.out.println("Código: "+cont+"\nNombre: "+nombre);
                         }
                             cont++;
                             System.out.println("==============================");
@@ -229,11 +232,11 @@ public class Libreria {
                 }
                 if(cont_cod==3){
                     System.out.println("==============================");
-                    while(cont<=existe){                    
-                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[1]+" and cod in (select distinct(cod) from rec_et where id = "+cod_etis[2]+" and cod = "+cont+")))").replaceAll(" - \n", "");                    
-                        cod=con.selectToString("select cod from recetas where cod = (select cod from rec_et where id = (select id from etiqueta where nom like'%"+busqueda+"%'  and cod="+cont+"))").replaceAll(" - \n", "");
+                    while(cont<=existe){
+                        nombre=con.selectToString("select nombre from recetas where cod in (select cod from rec_et where id="+cod_etis[0]+ "and id="+cod_etis[1]+" and id="+cod_etis[2]+") and cod="+cont).replaceAll(" - \n", "");                    
+                        cod=con.selectToString("select cod from recetas where cod ="+cont).replaceAll(" - \n", "");
                         if(!nombre.equals("")){
-                            System.out.println("Código: "+cod+"\nNombre: "+nombre);
+                            System.out.println("Código: "+cont+"\nNombre: "+nombre);
                         }
                             cont++;
                             System.out.println("==============================");
@@ -244,7 +247,7 @@ public class Libreria {
                 System.out.println("Selecciona la receta que deseas ver:");
                 seleccion=compInput();
                 int codRec = Integer.parseInt(cod);
-                desglosaReceta(con, seleccion,  busqueda,  codRec,'e', nombre);
+                desglosaReceta(con, seleccion,  busqueda,  codRec,'e', nombre, cod_etis);
             }
         }
     
@@ -254,17 +257,24 @@ public class Libreria {
     
     
     //desglosa la búsqueda de una receta seleccionada - //este método se va a llamar cuando ya se ha comprobado que la receta en cuestión existe
-    public static void desglosaReceta(Conexion con, int indice, String busqueda, int EtiquetaFound,char opc, String nombre) throws SQLException{
-        String creador="", desc="", ingre="", pasos="", tags="";
-        int existe=-1;
+    public static void desglosaReceta(Conexion con, int indice, String busqueda, int EtiquetaFound,char opc, String nombre, int[] cod_etis) throws SQLException{
+        String creador="", desc="", ingre="", pasos="", tags="", valoracion="";
+        int existe=-1, estrellas=0;
         if(opc=='u'){
             tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
-            creador=con.selectToString("select owner from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
-            desc=con.selectToString("select descripcion from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
-            ingre=con.selectToString("select ingredientes from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
-            pasos=con.selectToString("select pasos from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            creador=con.selectToString("select owner from recetas where lower(owner) like'%"+busqueda+"%'and cod="+indice).replaceAll(" - \n", "");
+            desc=con.selectToString("select descripcion from recetas where lower(owner) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            ingre=con.selectToString("select ingredientes from recetas where lower(owner) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            pasos=con.selectToString("select pasos from recetas where lower(owner) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            valoracion=con.selectToString("select estrellas from recetas where lower(owner) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
             nombre = nombre.toUpperCase();
-            System.out.println("\n======= "+nombre+" =======");   
+            estrellas = Integer.parseInt(valoracion);
+            if(estrellas == 0) System.out.println("No tiene valoraciones");
+            if(estrellas == 1) System.out.println("\n======= "+nombre+" \u001B[33m★\u001B[30m =======");
+            if(estrellas == 2) System.out.println("\n======= "+nombre+" \u001B[33m★★\u001B[30m =======");
+            if(estrellas == 3) System.out.println("\n======= "+nombre+" \u001B[33m★★★\u001B[30m =======");
+            if(estrellas == 4) System.out.println("\n======= "+nombre+" \u001B[33m★★★★\u001B[30m =======");
+            if(estrellas == 5) System.out.println("\n======= "+nombre+" \u001B[33m★★★★★\u001B[30m =======");
             System.out.println("Tags: "+tags);
             System.out.println("Creador: "+creador);
             System.out.println("Descripcion: "+desc);
@@ -272,14 +282,24 @@ public class Libreria {
             System.out.println("===================");
             System.out.println("Pasos: \n"+pasos);
             System.out.println("===================");
+            /* PARTE DE LAS VALORACIONES */
+            
         }
         if(opc=='n'){
             tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
-            creador=con.selectToString("select owner from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
-            desc=con.selectToString("select descripcion from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
-            ingre=con.selectToString("select ingredientes from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
-            pasos=con.selectToString("select pasos from recetas where nombre like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            creador=con.selectToString("select owner from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            desc=con.selectToString("select descripcion from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            ingre=con.selectToString("select ingredientes from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "");
+            pasos=con.selectToString("select pasos from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            valoracion=con.selectToString("select estrellas from recetas where lower(nombre) like'%"+busqueda+"%' and cod="+indice).replaceAll(" - \n", "").replaceAll(" - ", "\n");
             nombre = nombre.toUpperCase();
+            estrellas = Integer.parseInt(valoracion);
+            if(estrellas == 0) System.out.println("No tiene valoraciones");
+            if(estrellas == 1) System.out.println("\n======= "+nombre+" \u001B[33m★\u001B[30m =======");
+            if(estrellas == 2) System.out.println("\n======= "+nombre+" \u001B[33m★★\u001B[30m =======");
+            if(estrellas == 3) System.out.println("\n======= "+nombre+" \u001B[33m★★★\u001B[30m =======");
+            if(estrellas == 4) System.out.println("\n======= "+nombre+" \u001B[33m★★★★\u001B[30m =======");
+            if(estrellas == 5) System.out.println("\n======= "+nombre+" \u001B[33m★★★★★\u001B[30m =======");
             System.out.println("\n======= "+nombre+" =======");   
             System.out.println("Tags: "+tags);
             System.out.println("Creador: "+creador);
@@ -290,12 +310,22 @@ public class Libreria {
             System.out.println("==================="); 
         }
         if(opc=='e'){
+            System.out.println("EtiquetaFound => "+EtiquetaFound);
+            System.out.println("indice => "+indice);
             tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
-            creador=con.selectToString("select owner from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "");
-            desc=con.selectToString("select descripcion from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "");
-            ingre=con.selectToString("select ingredientes from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "");
-            pasos=con.selectToString("select pasos from recetas where cod in (select cod from rec_et where id="+EtiquetaFound+" and cod="+indice+")").replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            creador=con.selectToString("select owner from recetas where cod in (select cod from rec_et where id in (select id from etiqueta where id ="+indice+"))").replaceAll(" - \n", "");
+            desc=con.selectToString("select descripcion from recetas where cod in (select cod from rec_et where cod="+indice+")").replaceAll(" - \n", "");
+            ingre=con.selectToString("select ingredientes from recetas where cod in (select cod from rec_et where cod="+indice+")").replaceAll(" - \n", "");
+            pasos=con.selectToString("select pasos from recetas where cod in (select cod from rec_et where cod="+indice+")").replaceAll(" - \n", "").replaceAll(" - ", "\n");
+            valoracion=con.selectToString("select estrellas from recetas where cod in (select cod from rec_et where id in (select id from etiqueta where id ="+indice+"))").replaceAll(" - \n", "").replaceAll(" - ", "\n");
             nombre = nombre.toUpperCase();
+            estrellas = Integer.parseInt(valoracion);
+            if(estrellas == 0) System.out.println("No tiene valoraciones");
+            if(estrellas == 1) System.out.println("\n======= "+nombre+" \u001B[33m★\u001B[30m =======");
+            if(estrellas == 2) System.out.println("\n======= "+nombre+" \u001B[33m★★\u001B[30m =======");
+            if(estrellas == 3) System.out.println("\n======= "+nombre+" \u001B[33m★★★\u001B[30m =======");
+            if(estrellas == 4) System.out.println("\n======= "+nombre+" \u001B[33m★★★★\u001B[30m =======");
+            if(estrellas == 5) System.out.println("\n======= "+nombre+" \u001B[33m★★★★★\u001B[30m =======");
             System.out.println("\n======= "+nombre+" =======");   
             System.out.println("Tags: "+tags);
             System.out.println("Creador: "+creador);
@@ -751,8 +781,74 @@ public class Libreria {
         }
     }
     
+    //crea las tablas necesarias en en la BD y los usuarios 'admin' y 'base' para que no sea necesario abrir ORACLE
+    public static void BDsetUpIns(Conexion con) throws SQLException{
+        String tablaUsu = "create table usuarios (usr 	varchar2(25),pass    varchar2(100) not null,mail    varchar2(50),lvl     number(1) check (lvl between 0 and 2),constraint pk_usuarios primary key (usr))";
+        //original - funciona - NO BORRAR- String tablaRece = "create table recetas(cod	    integer generated always as identity (start with 1 increment by 1),owner 	varchar2(25),nombre  varchar2(25),descripcion    varchar2(100) not null,ingredientes varchar2(550), pasos   varchar2(500), constraint pk_recetas primary key (cod),constraint fk_rec_usu foreign key (owner) references usuarios(usr))";
+        //nuevo "create table con estrellas"
+        String tablaRece = "create table recetas(cod integer generated always as identity (start with 1 increment by 1), owner 	varchar2(25), nombre  varchar2(25), descripcion    varchar2(100) not null, ingredientes varchar2(550), pasos   varchar2(500), estrellas number(1,0) check (estrellas between 0 and 5), constraint pk_recetas primary key (cod), constraint fk_rec_usu foreign key (owner) references usuarios(usr))";
+        String tablaEtiq ="create table etiqueta (id integer generated always as identity (start with 1 increment by 1) primary key, nom varchar2(30))";
+        String tablaRec_Et="create table rec_et (cod	    number(3), id      integer, constraint pk_rec_et primary key(cod, id),constraint fk_rec_re foreign key (cod) references recetas(cod))";
+        String tablaStars="create table estrellas (usuario varchar(25),receta number(3),fecha date, opinion varchar2(500),valoracion number(1)check(valoracion between 1 and 5),constraint pk_estrellas primary key (usuario, receta, fecha), constraint fk_estre_usu foreign key (usuario) references usuarios(usr), constraint fk_estre_rec foreign key (receta) references recetas(cod))";
+        String admin = "insert into usuarios values ('admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'admin@admin.com', 2)";
+        String base = "insert into usuarios values ('base', 'base', 'base', 0)";
+        String testUsr="insert into usuarios values ('test', '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08', 'test@test.com', 1)";//borrar cuando esté la práctica   
+        String[] receta={"insert into recetas (owner, nombre, descripcion, ingredientes, pasos, estrellas) values ('test', 'macarrones', 'Un delicioso plato de pasta para salir del paso un domingo por la tarde', 'macarron, tomate, carne, oregano', '1. Ponemos el agua a cocer y echamos los macarrones - 2. Esperamos unos 15 minutos - 3. Los servimos echando el resto de ingredientes', 0)","insert into recetas (owner, nombre, descripcion, ingredientes, pasos, estrellas) values ('test', 'Pizza', 'Un plato tradicional italiano delicioso para disfrutar en familia o con amigos', 'masa, tomate, peperoni, champiñones, queso, jamon, piña', '1. Hacemos la masa de la pizza - 2. Ponemos el tomate como base - 3. Colocamos el resto de ingredientes al gusto - 4. Lo metemos al horno 30 min y listo para servir', 0)","insert into recetas (owner, nombre, descripcion, ingredientes, pasos, estrellas) values ('test', 'Alpujarreño', 'Un plato para la gente mas de campo', 'morcilla, chorizo, patatas, salchichas, pimiento', '1. Prepara cada cosa de manera individual - 2. sirverlo al azar en el plato', 0)"};        
+        String[] etiRece={"insert into rec_et (cod, id) values (1, 1)","insert into rec_et (cod, id) values (1, 2)","insert into rec_et (cod, id) values (1, 5)","insert into rec_et (cod, id) values (2, 3)","insert into rec_et (cod, id) values (2, 1)","insert into rec_et (cod, id) values (2, 17)","insert into rec_et (cod, id) values (3, 1)","insert into rec_et (cod, id) values (3, 2)","insert into rec_et (cod, id) values (3, 14)"};
+        String F_mRece=("create or replace procedure muestraValor(creador in varchar2, cod in number) is cursor datos is select * from estrellas where usuario = creador and receta = cod; lista datos%rowtype; begin open datos; loop fetch datos into lista; exit when datos%notfound; dbms_output.put_line('USUARIO: '||lista.usuario); dbms_output.put_line('FECHA: '||lista.fecha); dbms_output.put_line('OPINION: '||lista.opinion); end loop; close datos; end muestraValor");
+        
+        //las etiquetas
+        String etiq="";
+        String err="ninguno";
+        Etiquetas[]etiqueta=Etiquetas.values();
+        try{
+            con.insert(tablaUsu);
+            err="tablaUsu";
+            con.insert(tablaRece);
+            err="tablaRece";
+            con.insert(tablaEtiq);
+            err="tablaEtiq";
+            for(int i=1; i<etiqueta.length; i++){
+                etiq="insert into etiqueta (nom) values ('"+etiqueta[i].toString()+"')";
+                con.insert(etiq);
+            }
+            err="Etiq insert";
+            con.insert(tablaRec_Et);
+            err="tablaRec_Et";
+            con.insert(tablaStars);
+            err="tablaStars";
+            con.insert(admin);
+            err="admin";
+            con.insert(base);
+            err="base";
+            con.insert(testUsr);
+            err="testUsr";
+            for(int i=0; i<3; i++){
+                con.insert(receta[i]);
+            }
+            
+            err="insertRece";
+            
+            for(int i=0; i<3; i++){
+                con.insert(etiRece[i]);
+            }
+            for(int i=3; i<6; i++){
+                con.insert(etiRece[i]);
+            }
+            for(int i=6; i<9; i++){
+                con.insert(etiRece[i]);
+            }
+            
+            con.insert(F_mRece);
+            err="muestraValor";
+        }catch(Exception e){
+            System.out.println("\nError: "+err);
+        }
+    }
+    
     //destruye todo a su paso -CUIDADORRRLL fistro de la pradera
     public static void destroyAll(Conexion con) throws SQLException{
+        System.out.println("Destrozando la base de datos!!!");
         String err="ninguno";
         String dropRec_Et="drop table rec_et cascade constraints";
         String dropEtiq="drop table etiqueta cascade constraints";
