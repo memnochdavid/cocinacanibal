@@ -249,7 +249,7 @@ public class Cocina_Canibal {
                         break;
                     case SALIR:
                         salirReceta=true;
-                        salir = true; //ESTA AQUI POR AHORA PARA PODER CERRAR EL PROGRAMA
+                        salir = true; //ESTA AQUI PARA PODER CERRAR EL PROGRAMA
                         break;
                     default:
                         break;
@@ -258,6 +258,7 @@ public class Cocina_Canibal {
             }while(!salirReceta);
         //salir=true;    
         }while(!salir);
+        System.out.println("Gracias por usar Cocina Caníbal");
         con.cierre();
         
     }

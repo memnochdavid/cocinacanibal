@@ -258,8 +258,10 @@ public class Libreria {
     
     //desglosa la búsqueda de una receta seleccionada - //este método se va a llamar cuando ya se ha comprobado que la receta en cuestión existe
     public static void desglosaReceta(Conexion con, int indice, String busqueda, int EtiquetaFound,char opc, String nombre, int[] cod_etis) throws SQLException{
+        Scanner teclado=new Scanner(System.in);
         String creador="", desc="", ingre="", pasos="", tags="", valoracion="";
         int existe=-1, estrellas=0;
+        char opc_opiniones=' ';
         if(opc=='u'){
             tags=con.selectToString("select nom from etiqueta where id in (select id from rec_et where cod="+indice+")").replaceAll(" - \n", ", ");
             creador=con.selectToString("select owner from recetas where lower(owner) like'%"+busqueda+"%'and cod="+indice).replaceAll(" - \n", "");
@@ -282,6 +284,19 @@ public class Libreria {
             System.out.println(formatString("verde")+"==================="+formatString("reset"));
             System.out.println("Pasos: \n"+pasos);
             System.out.println(formatString("verde")+"==================="+formatString("reset"));
+            
+            //para mostrar las opiniones de la receta seleccionada a desglosar
+            System.out.println("¿Quieres ver las opiniones de los usuarios sobre esta receta?(s/n)");
+            do{
+                System.out.print(">");
+                opc_opiniones=teclado.next().charAt(0);
+                if(opc_opiniones=='S')opc_opiniones='s';
+                if(opc_opiniones=='N')opc_opiniones='n';
+            }while(opc_opiniones!='s' && opc_opiniones!='n');
+            if(opc_opiniones=='s'){
+                System.out.println("Mostrando opiniones...");
+                muestraOpiniones(con, indice);
+            }
             /* PARTE DE LAS VALORACIONES */
             
         }
@@ -307,7 +322,20 @@ public class Libreria {
             System.out.println("Ingredientes: "+ingre);
             System.out.println(formatString("verde")+"==================="+formatString("reset"));
             System.out.println("Pasos: \n"+pasos);
-            System.out.println(formatString("verde")+"==================="+formatString("reset")); 
+            System.out.println(formatString("verde")+"==================="+formatString("reset"));
+            
+            //para mostrar las opiniones de la receta seleccionada a desglosar
+            System.out.println("¿Quieres ver las opiniones de los usuarios sobre esta receta?(s/n)");
+            do{
+                System.out.print(">");
+                opc_opiniones=teclado.next().charAt(0);
+                if(opc_opiniones=='S')opc_opiniones='s';
+                if(opc_opiniones=='N')opc_opiniones='n';
+            }while(opc_opiniones!='s' && opc_opiniones!='n');
+            if(opc_opiniones=='s'){
+                System.out.println("Mostrando opiniones...");
+                muestraOpiniones(con, indice);
+            }
         }
         if(opc=='e'){
             //System.out.println("EtiquetaFound => "+EtiquetaFound);
@@ -335,11 +363,51 @@ public class Libreria {
             System.out.println("Ingredientes: "+ingre);
             System.out.println(formatString("verde")+"==================="+formatString("reset"));
             System.out.println("Pasos: \n"+pasos);
-            System.out.println(formatString("verde")+"==================="+formatString("reset"));   
+            System.out.println(formatString("verde")+"==================="+formatString("reset"));  
+            
+            //para mostrar las opiniones de la receta seleccionada a desglosar
+            System.out.println("¿Quieres ver las opiniones de los usuarios sobre esta receta?(s/n)");
+            do{
+                System.out.print(">");
+                opc_opiniones=teclado.next().charAt(0);
+                if(opc_opiniones=='S')opc_opiniones='s';
+                if(opc_opiniones=='N')opc_opiniones='n';
+            }while(opc_opiniones!='s' && opc_opiniones!='n');
+            if(opc_opiniones=='s'){
+                System.out.println("Mostrando opiniones...");
+                muestraOpiniones(con, indice);
+            }
         }
     }
     
-    //public static void 
+    public static void muestraOpiniones(Conexion con, int cod_receta) throws SQLException{
+        String usr, nom_receta, fecha, opinion, puntuacion="";
+        int valoracion, existe_valoracion=-1, estrellas;
+        ResultSet rs=con.select2("select count(*) from estrellas where receta="+cod_receta);
+        rs.next();
+        existe_valoracion=rs.getInt(1);
+        if(existe_valoracion<1) System.out.println("No hay valoraciones para esta receta.");
+        else{
+            
+            rs=con.select2("select usuarios.usr, recetas.nombre, estrellas.fecha, estrellas.opinion, estrellas.valoracion from usuarios, recetas, estrellas where usuario=usr and receta=cod and receta="+cod_receta);
+            for(int i=1; i<=existe_valoracion; i++){
+                rs.next();
+                usr=rs.getString(1);
+                nom_receta=rs.getString(2);
+                fecha=rs.getString(3);
+                opinion=rs.getString(4);
+                valoracion=rs.getInt(5);
+
+                if(valoracion == 1) puntuacion="\u001B[33m★\u001B[30m";
+                if(valoracion == 2) puntuacion="\u001B[33m★★\u001B[30m";
+                if(valoracion == 3) puntuacion="\u001B[33m★★★\u001B[30m";
+                if(valoracion == 4) puntuacion="\u001B[33m★★★★\u001B[30m";
+                if(valoracion == 5) puntuacion="\u001B[33m★★★★★\u001B[30m";            
+
+                System.out.println("\nReceta: "+nom_receta+"\nValoración "+i+": "+"\nUsuario: "+usr+"\nPuntuación: "+puntuacion+"\nOpinó: "+opinion); 
+            }
+        }
+    }
     
     //borrar y/o modificar receta    
     public static void borraModReceta(Conexion con, Usuario login, int chosen, char opc) throws SQLException{
@@ -1004,7 +1072,7 @@ public class Libreria {
             System.out.print(">");
             busqueda=teclado.next();
             muestraRecetasNombre(con, busqueda, tipoBus);
-        }
+        }        
     }
     
 }
