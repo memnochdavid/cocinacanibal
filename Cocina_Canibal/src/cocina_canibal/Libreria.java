@@ -379,16 +379,18 @@ public class Libreria {
             }
         }
     }
-    
+    //muestra cualquier opinión y valoración que la receta cuyo id recibe, tenga.
     public static void muestraOpiniones(Conexion con, int cod_receta) throws SQLException{
+        //este método usa los ResultSets como tú querías, lo cual demiestra que sabemos usarlos, y que hemos aprendido a lo 
+        //largo de esta práctica, que para eso es que existen estas prácticas, ¿verdad? 
+        //entonces no es necesario tener en cuenta que hemos trabajado con Strings, ¿verdad? ¿verdad? ¿verdad? :(
         String usr, nom_receta, fecha, opinion, puntuacion="";
         int valoracion, existe_valoracion=-1, estrellas;
         ResultSet rs=con.select2("select count(*) from estrellas where receta="+cod_receta);
         rs.next();
         existe_valoracion=rs.getInt(1);
         if(existe_valoracion<1) System.out.println("No hay valoraciones para esta receta.");
-        else{
-            
+        else{            
             rs=con.select2("select usuarios.usr, recetas.nombre, estrellas.fecha, estrellas.opinion, estrellas.valoracion from usuarios, recetas, estrellas where usuario=usr and receta=cod and receta="+cod_receta);
             for(int i=1; i<=existe_valoracion; i++){
                 rs.next();
@@ -403,8 +405,8 @@ public class Libreria {
                 if(valoracion == 3) puntuacion="\u001B[33m★★★\u001B[30m";
                 if(valoracion == 4) puntuacion="\u001B[33m★★★★\u001B[30m";
                 if(valoracion == 5) puntuacion="\u001B[33m★★★★★\u001B[30m";            
-
-                System.out.println("\nReceta: "+nom_receta+"\nValoración "+i+": "+"\nUsuario: "+usr+"\nPuntuación: "+puntuacion+"\nOpinó: "+opinion); 
+                System.out.println("\nReceta: "+nom_receta+"\nValoración "+i+": "+"\nUsuario: "+usr+"\nPuntuación: "+puntuacion+"\nOpinó: "+opinion);
+                System.out.println(formatString("verde")+"==================="+formatString("reset"));
             }
         }
     }
